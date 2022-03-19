@@ -1,0 +1,67 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <Nullable>enable</Nullable>
+        <UseWPF>true</UseWPF>
+        <ApplicationIcon>Resources\xws0HqMaSsI.ico</ApplicationIcon>
+        <LangVersion>10</LangVersion>
+        <TargetFrameworks>net472;net48;net6.0-windows</TargetFrameworks>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="FFME.Windows" Version="4.4.350" />
+      <PackageReference Include="MahApps.Metro" Version="2.4.9" />
+      <PackageReference Include="MahApps.Metro.IconPacks" Version="4.11.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="xws0HqMaSsI.ico" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Resources\avcodec-58.dll" />
+      <AdditionalFiles Include="Resources\avcodec-58.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <None Remove="Resources\avdevice-58.dll" />
+      <AdditionalFiles Include="Resources\avdevice-58.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <None Remove="Resources\avfilter-7.dll" />
+      <AdditionalFiles Include="Resources\avfilter-7.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <None Remove="Resources\avformat-58.dll" />
+      <AdditionalFiles Include="Resources\avformat-58.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <None Remove="Resources\avutil-56.dll" />
+      <AdditionalFiles Include="Resources\avutil-56.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <None Remove="Resources\postproc-55.dll" />
+      <AdditionalFiles Include="Resources\postproc-55.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <None Remove="Resources\swresample-3.dll" />
+      <AdditionalFiles Include="Resources\swresample-3.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <None Remove="Resources\swscale-5.dll" />
+      <AdditionalFiles Include="Resources\swscale-5.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Resource Include="Resources\xws0HqMaSsI.ico" />
+      <None Remove="Resources\background.png" />
+      <Resource Include="Resources\background.png" />
+      <None Remove="Resources\play-buttton.png" />
+      <Resource Include="Resources\play.png" />
+      <None Remove="Resources\pause.png" />
+      <Resource Include="Resources\pause.png" />
+    </ItemGroup>
+
+</Project>
