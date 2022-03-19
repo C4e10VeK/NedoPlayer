@@ -4,7 +4,6 @@
 
 ## TODO
 
-- [X] Cross-platform window creation (Windows, Linux)
 - [X] Add event aggregator
 - [ ] Event aggregator implementation
 - [ ] Add playlist
@@ -13,3 +12,5 @@
 - [ ] Add base menu
 - [ ] Rewrite media-player window and control design
 - [ ] Rewrite MediaElement
+- [ ] ......
+- [ ] Rewrite on C++ and add Vulkan for GPU accelerate
