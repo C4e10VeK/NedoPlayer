@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>10</LangVersion>
+        <TargetFrameworks>net48;net6.0-windows</TargetFrameworks>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Reference Include="System.Net" Condition="'$(TargetFramework)' == 'net48'" />
+      <Reference Include="System.Net.Http" Condition="'$(TargetFramework)' == 'net48'" />
+    </ItemGroup>
+
+</Project>

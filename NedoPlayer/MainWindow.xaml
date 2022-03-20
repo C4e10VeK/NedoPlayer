@@ -32,7 +32,7 @@
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <Menu>
+        <Menu Grid.Row="0">
             <MenuItem Header="Media">
                 <MenuItem Header="Open" InputGestureText="Ctrl+O"></MenuItem>
                 <MenuItem Header="Open folder" InputGestureText="Ctrl+Shift+O"></MenuItem>
