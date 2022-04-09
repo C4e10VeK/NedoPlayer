@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NedoPlayer", "NedoPlayer\NedoPlayer.csproj", "{9D4AC6A2-6148-429C-9E8B-235A8C2EDF7D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NedoPlayer.EventAggregator", "NedoPlayer.EventAggregator\NedoPlayer.EventAggregator.csproj", "{AA6DF973-6BC0-4158-BF8A-85B269346B05}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NedoPlayer.NedoEventAggregator", "NedoPlayer.NedoEventAggregator\NedoPlayer.NedoEventAggregator.csproj", "{AA6DF973-6BC0-4158-BF8A-85B269346B05}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

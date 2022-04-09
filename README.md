@@ -5,11 +5,12 @@
 ## TODO
 
 - [X] Add event aggregator
-- [ ] Event aggregator implementation
+- [X] Event aggregator implementation
 - [ ] Add playlist
 - [ ] Add base command for binding
-- [ ] Add window playlist
 - [ ] Add base menu
+
+###In future:
 - [ ] Rewrite media-player window and control design
 - [ ] Rewrite MediaElement
 - [ ] ......

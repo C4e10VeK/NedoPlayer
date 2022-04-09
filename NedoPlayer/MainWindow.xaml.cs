@@ -1,5 +1,13 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Windows;
+using System.Windows.Forms;
+using System.Windows.Input;
+using System.Windows.Threading;
 using NedoPlayer.ViewModels;
+using Application = System.Windows.Application;
+using Cursors = System.Windows.Input.Cursors;
+using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 
 namespace NedoPlayer
 {
@@ -14,14 +22,29 @@ namespace NedoPlayer
             InitMediaPlayer();
         }
 
+        private DispatcherTimer _foo;
+
         private void InitMediaPlayer()
         {
             Unosquare.FFME.Library.FFmpegDirectory = @".\Resources";
 
-            VideoPlayer.Open(new Uri(@"C:\Users\endar\Videos\Desktop\Desktop 2021.09.14 - 00.40.27.01.mp4"));
+            VideoPlayer.Open(new Uri(@"C:\Users\endar\Downloads\INCENDIMUS [Death Knight Theme].mp4"));
+
+            _foo = new DispatcherTimer(DispatcherPriority.Input)
+            {
+                Interval = TimeSpan.FromSeconds(1)
+            };
+            _foo.Tick += (_, _) =>
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    Mouse.OverrideCursor = Cursors.None;
+                    VideoPlayerControl.Visibility = Visibility.Collapsed;
+                });
+            }; 
 
             if (DataContext is not MainViewModel dt) return;
-            dt.PlayPauseRequested += async (_, _) =>
+            dt.ControlService.PlayPauseRequested += async (_, _) =>
             {
                 if (VideoPlayer.IsPlaying)
                 {
@@ -34,21 +57,42 @@ namespace NedoPlayer
                 dt.Paused = VideoPlayer.IsPlaying;
             };
 
-            dt.CloseRequested += (_, _) =>
+            dt.ControlService.VolumeRequested += (sender, vol) =>
             {
-                Close();
-            };
+                VideoPlayer.Volume = vol;
+            }; 
+
+            dt.ControlService.CloseRequested += (_, _) => Close();
 
             VideoPlayer.MediaOpened += (_, _) =>
             {
                 dt.TotalDuration = VideoPlayer.PlaybackEndTime.GetValueOrDefault(TimeSpan.Zero);
                 dt.AppTitle = $"{VideoPlayer.Source.LocalPath} - {dt.AppTitle}";
             };
+            
+            
         }
 
         private async void MainWindow_OnClosed(object? sender, EventArgs e)
         {
             await VideoPlayer.Close();
+        }
+
+        private void MainWindow_OnMouseMove(object sender, MouseEventArgs e)
+        {
+            if (DataContext is not MainViewModel {FullscreenVisible: Visibility.Collapsed})
+            {
+                _foo.IsEnabled = false;
+                Mouse.OverrideCursor = null;
+                VideoPlayerControl.Visibility = Visibility.Visible;
+                return;
+            }
+            
+            _foo.IsEnabled = true;
+            _foo.Stop();
+            Mouse.OverrideCursor = null;
+            VideoPlayerControl.Visibility = Visibility.Visible;
+            _foo.Start();
         }
     }
 }

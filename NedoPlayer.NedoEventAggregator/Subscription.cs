@@ -1,4 +1,4 @@
-﻿namespace EventAggregator;
+﻿namespace NedoPlayer.NedoEventAggregator;
 
 public class Subscription : ISubscription
 {

@@ -7,7 +7,8 @@
              xmlns:utils="clr-namespace:NedoPlayer.Utils"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="800">
+             d:DesignHeight="60" d:DesignWidth="800"
+             DataContext="{Binding ControlViewModel, Source={StaticResource ViewModelLocator}}">
     <Grid>
         <Grid
             VerticalAlignment="Bottom"
@@ -15,7 +16,7 @@
             Background="{StaticResource MahApps.Brushes.Control.Background}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition></ColumnDefinition>
@@ -27,7 +28,7 @@
             <utils:FormattedTimeSlider Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
                                        Margin="5 0" Height="10"
                                        Style="{DynamicResource MahApps.Styles.Slider.Flat}"
-                                       Minimum="0" Maximum="{Binding TotalDuration.TotalSeconds}" SmallChange="0.5"
+                                       Minimum="0" Maximum="{Binding TotalDuration.TotalSeconds}"
                                        AutoToolTipPlacement="TopLeft"
                                        AutoToolTipFormat="{}{0:hh\:mm\:ss}"
                                        Value="{Binding PlayerTimeToEndSeconds, Mode=TwoWay}"
@@ -49,7 +50,7 @@
                         Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Button Width="25" Height="25" Margin="5 0"
                         Style="{DynamicResource MahApps.Styles.Button.Circle}">
-                    <iconPacks:PackIconModern Width="15" Kind="NavigatePrevious" />
+                    <iconPacks:PackIconModern Width="15" Height="15" Kind="ControlRewindVariant" />
                 </Button>
                 <Button Width="25" Height="25" Margin="5 0"
                         Style="{DynamicResource MahApps.Styles.Button.Circle}"
@@ -60,7 +61,7 @@
                 </Button>
                 <Button Width="25" Height="25" Margin="5 0"
                         Style="{DynamicResource MahApps.Styles.Button.Circle}">
-                    <iconPacks:PackIconModern Width="15" Kind="NavigateNext" />
+                    <iconPacks:PackIconModern Width="15" Height="15" Kind="ControlFastforwardVariant" />
                 </Button>
             </StackPanel>
             <StackPanel Grid.Row="1" Grid.Column="2"
@@ -68,6 +69,25 @@
                 <Button Width="25" Height="25" Margin="5 0"
                         Style="{DynamicResource MahApps.Styles.Button.Circle}">
                     <iconPacks:PackIconModern Width="15" Kind="SoundMute" />
+                    <Button.ContextMenu>
+                        <ContextMenu Width="250" Background="{StaticResource MahApps.Brushes.Control.Background}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Button Grid.Column="0" Margin="0 0 5 0" Width="25" Height="25"
+                                        Style="{DynamicResource MahApps.Styles.Button.Circle}">
+                                    <iconPacks:PackIconModern Width="15" Kind="SoundMute" />
+                                </Button>
+                                <Slider Grid.Column="1"
+                                        Minimum="0" Maximum="100"
+                                        Value="{Binding Volume}"
+                                        AutoToolTipPlacement="TopLeft"
+                                        HorizontalAlignment="Stretch"></Slider>
+                            </Grid>
+                        </ContextMenu>
+                    </Button.ContextMenu>
                 </Button>
                 <Button VerticalAlignment="Center" HorizontalAlignment="Center"
                         Width="25" Height="25" Margin="5 0"
@@ -75,7 +95,8 @@
                     <iconPacks:PackIconModern Width="15" Kind="List" />
                 </Button>
                 <Button Width="25" Height="25" Margin="5 0"
-                        Style="{DynamicResource MahApps.Styles.Button.Circle}">
+                        Style="{DynamicResource MahApps.Styles.Button.Circle}"
+                        Command="{Binding MaximizeCommand}">
                     <iconPacks:PackIconModern Width="15" Kind="WindowMaximize" />
                 </Button>
                 <Button Width="25" Height="25" Margin="5 0"

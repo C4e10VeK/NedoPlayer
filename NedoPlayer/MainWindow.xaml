@@ -13,6 +13,7 @@
         mc:Ignorable="d" ResizeMode="CanResizeWithGrip"
         Title="{Binding AppTitle}" Height="450" Width="800" MinHeight="400" MinWidth="600"
         Closed="MainWindow_OnClosed"
+        MouseMove="MainWindow_OnMouseMove"
         DataContext="{Binding MainViewModel, Source={StaticResource ViewModelLocator}}">
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo>
@@ -24,7 +25,7 @@
         </TaskbarItemInfo>
     </Window.TaskbarItemInfo>
     <Window.InputBindings>
-        <KeyBinding Key="Q" Modifiers="Control" Command="{Binding CloseCommand}"></KeyBinding>
+        <KeyBinding Gesture="CTRL+Q" Command="{Binding CloseCommand}"></KeyBinding>
     </Window.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
@@ -32,7 +33,7 @@
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <Menu Grid.Row="0">
+        <Menu Grid.Row="0" Visibility="{Binding FullscreenVisible}">
             <MenuItem Header="Media">
                 <MenuItem Header="Open" InputGestureText="Ctrl+O"></MenuItem>
                 <MenuItem Header="Open folder" InputGestureText="Ctrl+Shift+O"></MenuItem>
@@ -45,9 +46,21 @@
                         <iconPacks:PackIconModern Width="15" Height="15" Kind="{Binding PlayPauseKind}" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Stop"></MenuItem>
-                <MenuItem Header="Next"></MenuItem>
-                <MenuItem Header="Prev"></MenuItem>
+                <MenuItem Header="Stop">
+                    <MenuItem.Icon>
+                        <iconPacks:PackIconModern Width="15" Height="15" Kind="ControlStop" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Next">
+                    <MenuItem.Icon>
+                        <iconPacks:PackIconModern Width="15" Height="15" Kind="ControlFastforwardVariant" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Prev">
+                    <MenuItem.Icon>
+                        <iconPacks:PackIconModern Width="15" Height="15" Kind="ControlRewindVariant" />
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
             <MenuItem Header="Help">
                 <MenuItem Header="Help"></MenuItem>
@@ -57,12 +70,11 @@
         </Menu>
         <ffme:MediaElement Grid.Row="1" x:Name="VideoPlayer"
                            LoadedBehavior="Play"
-                           Volume="0.05"
                            Position="{Binding PlayerTimeToEnd}">
             <ffme:MediaElement.Background>
-                <ImageBrush ImageSource="Resources/background.png" Stretch="UniformToFill"></ImageBrush>
+                <SolidColorBrush Color="Black"></SolidColorBrush>
             </ffme:MediaElement.Background>
         </ffme:MediaElement>
-        <controls:VideoPlayerControl Height="75" Grid.Row="2" />
+        <controls:VideoPlayerControl x:Name="VideoPlayerControl" Height="60" Grid.Row="2" />
     </Grid>
 </Window>

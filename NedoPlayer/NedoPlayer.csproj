@@ -4,7 +4,7 @@
         <OutputType>WinExe</OutputType>
         <Nullable>enable</Nullable>
         <UseWPF>true</UseWPF>
-        <ApplicationIcon>Resources\xws0HqMaSsI.ico</ApplicationIcon>
+        <ApplicationIcon>Resources\img\xws0HqMaSsI.ico</ApplicationIcon>
         <LangVersion>10</LangVersion>
         <TargetFrameworks>net48;net6.0-windows</TargetFrameworks>
     </PropertyGroup>
@@ -55,18 +55,18 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Resource Include="Resources\xws0HqMaSsI.ico" />
+      <Resource Include="Resources\img\background.png" />
+      <Resource Include="Resources\img\pause.png" />
+      <Resource Include="Resources\img\play.png" />
       <None Remove="Resources\background.png" />
-      <Resource Include="Resources\background.png" />
       <None Remove="Resources\play-buttton.png" />
-      <Resource Include="Resources\play.png" />
       <None Remove="Resources\pause.png" />
-      <Resource Include="Resources\pause.png" />
+      <Resource Include="Resources\img\xws0HqMaSsI.ico" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\EventAggregator\EventAggregator.csproj" />
-      <ProjectReference Include="..\NedoPlayer.EventAggregator\NedoPlayer.EventAggregator.csproj" />
+      <ProjectReference Include="..\NedoPlayer.NedoEventAggregator\NedoPlayer.NedoEventAggregator.csproj" />
     </ItemGroup>
 
 </Project>

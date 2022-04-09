@@ -2,12 +2,16 @@
 using System.Windows;
 using System.Windows.Input;
 using MahApps.Metro.IconPacks;
+using NedoPlayer.NedoEventAggregator;
+using NedoPlayer.Services;
 using NedoPlayer.Utils;
 
 namespace NedoPlayer.ViewModels
 {
     public sealed class MainViewModel : BaseViewModel
     {
+        private readonly MediaControlService _controlService;
+        
         private string _appTitle;
         private string _taskBarIcon;
 
@@ -17,10 +21,9 @@ namespace NedoPlayer.ViewModels
 
         private PackIconModernKind _playPauseKind;
 
-        public event EventHandler? CloseRequested;
-        public event EventHandler? PlayPauseRequested;
-        public event EventHandler<string>? NextRequested;
-        public event EventHandler<string>? PrevRequested;
+        private Visibility _fullscreenVisible;
+
+        public MediaControlService ControlService => _controlService;
 
         public string AppTitle
         {
@@ -48,19 +51,14 @@ namespace NedoPlayer.ViewModels
             set
             {
                 _playerTimeToEnd = value;
-                OnPropertyChanged(nameof(PlayerTimeToEnd));
+                NotifySliderDataChanged();
             }
         }
 
         public double PlayerTimeToEndSeconds
         {
-            get => _playerTimeToEnd.TotalSeconds;
-            set
-            {
-                _playerTimeToEnd = TimeSpan.FromSeconds(value);
-                OnPropertyChanged(nameof(PlayerTimeToEndSeconds));
-                OnPropertyChanged(nameof(PlayerTimeToEnd));
-            }
+            get => PlayerTimeToEnd.TotalSeconds;
+            set => PlayerTimeToEnd = TimeSpan.FromSeconds(value);
         }
 
         public TimeSpan TotalDuration
@@ -89,42 +87,53 @@ namespace NedoPlayer.ViewModels
             set => _paused = value;
         }
 
+        public Visibility FullscreenVisible
+        {
+            get => _fullscreenVisible;
+            set
+            {
+                _fullscreenVisible = value;
+                OnPropertyChanged(nameof(FullscreenVisible));
+            }
+        }
+
         public ICommand CloseCommand { get; set; }
         public ICommand PlayPauseCommand { get; set; }
 
-        public MainViewModel()
+        public MainViewModel(IEventAggregator aggregator) : base(aggregator)
         {
+            _controlService = new MediaControlService(this);
             _appTitle = "NedoPlayer";
-            _taskBarIcon = "./Resources/pause.png";
+            _taskBarIcon = "./Resources/img/pause.png";
             _paused = false;
             _playerTimeToEnd = TimeSpan.FromSeconds(0);
             _totalDuration = TimeSpan.Zero;
             _playPauseKind = PackIconModernKind.ControlPause;
+            _fullscreenVisible = Visibility.Visible;
 
-            CloseCommand = new RelayCommand(Close);
-            PlayPauseCommand = new RelayCommand(PlayPause);
+            CloseCommand = new RelayCommand(_controlService.Close);
+            PlayPauseCommand = new RelayCommand(_controlService.PlayPause);
+            
+            Aggregator.GetEvent<MaximizePlayer>().Subscribe(Maximize);
+
+            Aggregator.GetEvent<ChangeVolume>().Subscribe(vol =>  _controlService.ChangeVolume(this, vol));
         }
 
-        private void PlayPause(object? s)
+        private void Maximize()
         {
-            PlayPauseRequested?.Invoke(this, EventArgs.Empty);
-            if (!Paused)
+            if (FullscreenVisible != Visibility.Collapsed)
             {
-                PlayPauseKind = PackIconModernKind.ControlPlay;
-                TaskBarIcon = "./Resources/play.png";
+                FullscreenVisible = Visibility.Collapsed;
+                return;
             }
-            else
-            {
-                PlayPauseKind = PackIconModernKind.ControlPause;
-                TaskBarIcon = "./Resources/pause.png";
-            }
+                
+            FullscreenVisible = Visibility.Visible;
         }
 
-        private void Next(object? s)
+        private void NotifySliderDataChanged()
         {
-            NextRequested?.Invoke(this, string.Empty);
+            OnPropertyChanged(nameof(PlayerTimeToEnd));
+            OnPropertyChanged(nameof(PlayerTimeToEndSeconds));
         }
-
-        private void Close(object? s) => CloseRequested?.Invoke(this, EventArgs.Empty);
     }
 }
