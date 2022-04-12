@@ -65,7 +65,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\EventAggregator\EventAggregator.csproj" />
       <ProjectReference Include="..\NedoPlayer.NedoEventAggregator\NedoPlayer.NedoEventAggregator.csproj" />
     </ItemGroup>
 
