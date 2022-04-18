@@ -20,36 +20,36 @@
     </ItemGroup>
 
     <ItemGroup>
+      <AdditionalFiles Include="lib\swscale-5.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
       <None Remove="Resources\avcodec-58.dll" />
-      <AdditionalFiles Include="Resources\avcodec-58.dll">
+      <AdditionalFiles Include="lib\avcodec-58.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <AdditionalFiles Include="lib\avdevice-58.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <AdditionalFiles Include="lib\avfilter-7.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <AdditionalFiles Include="lib\avformat-58.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
+      <AdditionalFiles Include="lib\avutil-56.dll">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </AdditionalFiles>
       <None Remove="Resources\avdevice-58.dll" />
-      <AdditionalFiles Include="Resources\avdevice-58.dll">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </AdditionalFiles>
       <None Remove="Resources\avfilter-7.dll" />
-      <AdditionalFiles Include="Resources\avfilter-7.dll">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </AdditionalFiles>
       <None Remove="Resources\avformat-58.dll" />
-      <AdditionalFiles Include="Resources\avformat-58.dll">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </AdditionalFiles>
       <None Remove="Resources\avutil-56.dll" />
-      <AdditionalFiles Include="Resources\avutil-56.dll">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </AdditionalFiles>
       <None Remove="Resources\postproc-55.dll" />
-      <AdditionalFiles Include="Resources\postproc-55.dll">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </AdditionalFiles>
       <None Remove="Resources\swresample-3.dll" />
-      <AdditionalFiles Include="Resources\swresample-3.dll">
+      <AdditionalFiles Include="lib\postproc-55.dll">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </AdditionalFiles>
       <None Remove="Resources\swscale-5.dll" />
-      <AdditionalFiles Include="Resources\swscale-5.dll">
+      <AdditionalFiles Include="lib\swresample-3.dll">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </AdditionalFiles>
     </ItemGroup>
@@ -66,6 +66,27 @@
 
     <ItemGroup>
       <ProjectReference Include="..\NedoPlayer.NedoEventAggregator\NedoPlayer.NedoEventAggregator.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Update="Resources\Localization.en-us.resx">
+        <Generator>PublicResXFileCodeGenerator</Generator>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Localization.resx">
+        <Generator>PublicResXFileCodeGenerator</Generator>
+        <LastGenOutput>Localization.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Localization.ru-ru.resx">
+        <Generator>PublicResXFileCodeGenerator</Generator>
+      </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Resources\Localization.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Localization.resx</DependentUpon>
+      </Compile>
     </ItemGroup>
 
 </Project>

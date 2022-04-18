@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Windows;
-using System.Windows.Forms;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 using NedoPlayer.ViewModels;
@@ -16,25 +15,17 @@ namespace NedoPlayer
     /// </summary>
     public partial class MainWindow
     {
+        private readonly DispatcherTimer _timerForHide;
+        
         public MainWindow()
         {
             InitializeComponent();
             InitMediaPlayer();
-        }
-
-        private DispatcherTimer _foo;
-
-        private void InitMediaPlayer()
-        {
-            Unosquare.FFME.Library.FFmpegDirectory = @".\Resources";
-
-            VideoPlayer.Open(new Uri(@"C:\Users\endar\Downloads\INCENDIMUS [Death Knight Theme].mp4"));
-
-            _foo = new DispatcherTimer(DispatcherPriority.Input)
+            _timerForHide = new DispatcherTimer(DispatcherPriority.Input)
             {
-                Interval = TimeSpan.FromSeconds(1)
+                Interval = TimeSpan.FromSeconds(3)
             };
-            _foo.Tick += (_, _) =>
+            _timerForHide.Tick += (_, _) =>
             {
                 Application.Current.Dispatcher.Invoke(() =>
                 {
@@ -42,35 +33,47 @@ namespace NedoPlayer
                     VideoPlayerControl.Visibility = Visibility.Collapsed;
                 });
             }; 
+        }
+
+
+        private void InitMediaPlayer()
+        {
+            Unosquare.FFME.Library.FFmpegDirectory = @".\lib";
+
+            if (App.Args != null)
+                VideoPlayer.Open(new Uri(App.Args[0]));
 
             if (DataContext is not MainViewModel dt) return;
-            dt.ControlService.PlayPauseRequested += async (_, _) =>
+            dt.ControlController.PlayPauseRequested += async (mvm, _) =>
             {
-                if (VideoPlayer.IsPlaying)
+                if (mvm is not MainViewModel viewModel) return;
+                if (!VideoPlayer.IsOpen) return;
+
+                if (viewModel.IsPaused)
                 {
-                    await VideoPlayer.Pause();
-                    dt.Paused = !VideoPlayer.IsPlaying;
+                    await VideoPlayer.Play();
+                    viewModel.IsPaused = false;
                     return;
                 }
-
-                await VideoPlayer.Play();
-                dt.Paused = VideoPlayer.IsPlaying;
+                
+                await VideoPlayer.Pause();
+                viewModel.IsPaused = true;
             };
 
-            dt.ControlService.VolumeRequested += (sender, vol) =>
-            {
-                VideoPlayer.Volume = vol;
-            }; 
+            dt.ControlController.CloseRequested += (_, _) => Close();
 
-            dt.ControlService.CloseRequested += (_, _) => Close();
-
-            VideoPlayer.MediaOpened += (_, _) =>
+            dt.ControlController.MaximizeRequested += (_, fullscreen) =>
             {
-                dt.TotalDuration = VideoPlayer.PlaybackEndTime.GetValueOrDefault(TimeSpan.Zero);
-                dt.AppTitle = $"{VideoPlayer.Source.LocalPath} - {dt.AppTitle}";
+                if (fullscreen)
+                {
+                    _timerForHide.IsEnabled = true;
+                    VideoPlayerControl.SetValue(Grid.RowProperty, 1);
+                    return;
+                }
+                
+                _timerForHide.IsEnabled = false;
+                VideoPlayerControl.SetValue(Grid.RowProperty, 2);
             };
-            
-            
         }
 
         private async void MainWindow_OnClosed(object? sender, EventArgs e)
@@ -82,17 +85,15 @@ namespace NedoPlayer
         {
             if (DataContext is not MainViewModel {FullscreenVisible: Visibility.Collapsed})
             {
-                _foo.IsEnabled = false;
                 Mouse.OverrideCursor = null;
                 VideoPlayerControl.Visibility = Visibility.Visible;
                 return;
             }
             
-            _foo.IsEnabled = true;
-            _foo.Stop();
+            _timerForHide.Stop();
             Mouse.OverrideCursor = null;
             VideoPlayerControl.Visibility = Visibility.Visible;
-            _foo.Start();
+            _timerForHide.Start();
         }
     }
 }

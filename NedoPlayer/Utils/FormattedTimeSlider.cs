@@ -26,24 +26,20 @@ public class FormattedTimeSlider : Slider
 
     private void FormatAutoToolTip()
     {
-        if (!string.IsNullOrWhiteSpace(AutoToolTipFormat))
-        {
-            if (AutoToolTip != null)
-                AutoToolTip.Content = string.Format(AutoToolTipFormat,
-                    TimeSpan.FromSeconds(double.Parse((string) AutoToolTip.Content)));
-        }
+        if (string.IsNullOrWhiteSpace(AutoToolTipFormat)) return;
+        if (AutoToolTip != null)
+            AutoToolTip.Content = string.Format(AutoToolTipFormat,
+                TimeSpan.FromSeconds(double.Parse((string) AutoToolTip.Content)));
     }
 
     private ToolTip? AutoToolTip
     {
         get
         {
-            if (_autoToolTip == null)
-            {
-                var field = typeof(Slider).GetField("_autoToolTip", BindingFlags.NonPublic | BindingFlags.Instance);
-                Debug.Assert(field != null, nameof(field) + " != null");
-                _autoToolTip = field?.GetValue(this) as ToolTip;
-            }
+            if (_autoToolTip != null) return _autoToolTip;
+            var field = typeof(Slider).GetField("_autoToolTip", BindingFlags.NonPublic | BindingFlags.Instance);
+            Debug.Assert(field != null, nameof(field) + " != null");
+            _autoToolTip = field?.GetValue(this) as ToolTip;
 
             return _autoToolTip;
         }

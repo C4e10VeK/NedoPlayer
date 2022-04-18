@@ -35,3 +35,21 @@ public class Subscription<T> : ISubscription
 
     public SubscriptionToken SubscriptionToken { get; set; }
 }
+
+public class Subscription<T1, T2> : ISubscription
+{
+    private readonly Action<T1, T2>? _callback;
+    
+    public Subscription(Action<T1, T2>? callback, SubscriptionToken subscriptionToken)
+    {
+        _callback = callback;
+        SubscriptionToken = subscriptionToken;
+    }
+
+    public void Invoke(T1 arg1, T2 arg2)
+    {
+        _callback?.Invoke(arg1, arg2);
+    }
+
+    public SubscriptionToken SubscriptionToken { get; set; }
+}

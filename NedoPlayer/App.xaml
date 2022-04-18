@@ -3,15 +3,20 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:NedoPlayer"
              xmlns:utils="clr-namespace:NedoPlayer.Utils"
-             StartupUri="MainWindow.xaml">
+             StartupUri="MainWindow.xaml"
+             Startup="App_OnStartup">
     <Application.Resources>
          <ResourceDictionary>
              <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/light.red.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/dark.blue.xaml" />
              </ResourceDictionary.MergedDictionaries>
              <utils:ViewModelLocator x:Key="ViewModelLocator" />
+             <utils:BoolToPlayPauseKindConverter x:Key="BoolToPlayPauseKindConverter" />
+             <utils:VolumeToVolumeKindConverter x:Key="VolumeToVolumeKindConverter" />
+             <utils:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+             <utils:InverseBoolConverter x:Key="InverseBoolConverter" />
          </ResourceDictionary>
     </Application.Resources>
 </Application>

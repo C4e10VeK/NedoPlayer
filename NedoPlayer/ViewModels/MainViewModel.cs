@@ -1,40 +1,36 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
-using MahApps.Metro.IconPacks;
+using MahApps.Metro.Controls;
+using NedoPlayer.Controllers;
 using NedoPlayer.NedoEventAggregator;
-using NedoPlayer.Services;
 using NedoPlayer.Utils;
+using Unosquare.FFME.Common;
 
 namespace NedoPlayer.ViewModels
 {
     public sealed class MainViewModel : BaseViewModel
     {
-        private readonly MediaControlService _controlService;
-        
-        private string _appTitle;
-        private string _taskBarIcon;
+        public MediaControlController ControlController { get; }
 
-        private TimeSpan _playerTimeToEnd;
-        private TimeSpan _totalDuration;
-        private bool _paused;
+        private WindowState _wndState;
+        private WindowStyle _wndStyle;
+        private double _wndWidth;
+        private double _wndHeight;
 
-        private PackIconModernKind _playPauseKind;
-
-        private Visibility _fullscreenVisible;
-
-        public MediaControlService ControlService => _controlService;
-
-        public string AppTitle
+        private string _trackTitle;
+        public string TrackTitle
         {
-            get => _appTitle;
+            get => _trackTitle;
             set
             {
-                _appTitle = value;
-                OnPropertyChanged(nameof(AppTitle));
+                _trackTitle = value;
+                OnPropertyChanged(nameof(TrackTitle));
             }
         }
 
+        private string _taskBarIcon;
         public string TaskBarIcon
         {
             get => _taskBarIcon;
@@ -45,6 +41,7 @@ namespace NedoPlayer.ViewModels
             }
         }
 
+        private TimeSpan _playerTimeToEnd;
         public TimeSpan PlayerTimeToEnd
         {
             get => _playerTimeToEnd;
@@ -61,6 +58,7 @@ namespace NedoPlayer.ViewModels
             set => PlayerTimeToEnd = TimeSpan.FromSeconds(value);
         }
 
+        private TimeSpan _totalDuration;
         public TimeSpan TotalDuration
         {
             get => _totalDuration;
@@ -71,22 +69,18 @@ namespace NedoPlayer.ViewModels
             }
         }
 
-        public PackIconModernKind PlayPauseKind
+        private bool _isPaused;
+        public bool IsPaused
         {
-            get => _playPauseKind;
+            get => _isPaused;
             set
             {
-                _playPauseKind = value;
-                OnPropertyChanged(nameof(PlayPauseKind));
+                _isPaused = value;
+                OnPropertyChanged(nameof(IsPaused));
             }
         }
 
-        public bool Paused
-        {
-            get => _paused;
-            set => _paused = value;
-        }
-
+        private Visibility _fullscreenVisible;
         public Visibility FullscreenVisible
         {
             get => _fullscreenVisible;
@@ -97,37 +91,107 @@ namespace NedoPlayer.ViewModels
             }
         }
 
-        public ICommand CloseCommand { get; set; }
-        public ICommand PlayPauseCommand { get; set; }
+        private bool _isFullscreen;
+
+        public bool IsFullscreen
+        {
+            get => _isFullscreen;
+            set
+            {
+                _isFullscreen = value;
+                OnPropertyChanged(nameof(IsFullscreen));
+            }
+        }
+
+        private double _volume;
+        public double Volume
+        {
+            get => _volume / 100;
+            set
+            {
+                _volume = value;
+                OnPropertyChanged(nameof(Volume));
+            }
+        }
+
+        private bool _isMuted;
+        public bool IsMuted
+        {
+            get => _isMuted;
+            set
+            {
+                _isMuted = value;
+                OnPropertyChanged(nameof(IsMuted));
+            }
+        }
+
+        public ICommand CloseCommand { get; }
+        public ICommand PlayPauseCommand { get; }
+        public ICommand MaximizeCommand { get; }
+        public ICommand MuteCommand { get; }
+        public ICommand MediaOpenedCommand { get; }
 
         public MainViewModel(IEventAggregator aggregator) : base(aggregator)
         {
-            _controlService = new MediaControlService(this);
-            _appTitle = "NedoPlayer";
+            ControlController = new MediaControlController(this);
+            _trackTitle = "";
             _taskBarIcon = "./Resources/img/pause.png";
-            _paused = false;
+            _isPaused = true;
             _playerTimeToEnd = TimeSpan.FromSeconds(0);
             _totalDuration = TimeSpan.Zero;
-            _playPauseKind = PackIconModernKind.ControlPause;
             _fullscreenVisible = Visibility.Visible;
+            _volume = 100;
+            _isMuted = false;
 
-            CloseCommand = new RelayCommand(_controlService.Close);
-            PlayPauseCommand = new RelayCommand(_controlService.PlayPause);
-            
-            Aggregator.GetEvent<MaximizePlayer>().Subscribe(Maximize);
-
-            Aggregator.GetEvent<ChangeVolume>().Subscribe(vol =>  _controlService.ChangeVolume(this, vol));
+            CloseCommand = new RelayCommand(ControlController.Close);
+            PlayPauseCommand = new RelayCommand(ControlController.PlayPause);
+            MaximizeCommand = new RelayCommand(Maximize);
+            MuteCommand = new RelayCommand(_ => IsMuted = !IsMuted);
+            MediaOpenedCommand = new RelayCommand(MediaOpened);
         }
 
-        private void Maximize()
+        private void Maximize(object? s)
         {
-            if (FullscreenVisible != Visibility.Collapsed)
+            if (Application.Current.MainWindow is not MetroWindow wnd) return;
+
+            if (!_isFullscreen)
             {
+                _wndState = wnd.WindowState;
+                _wndStyle = wnd.WindowStyle;
+                _wndWidth = wnd.Width;
+                _wndHeight = wnd.Height;
+            
+                wnd.WindowState = WindowState.Maximized;
+                wnd.WindowStyle = WindowStyle.None;
+                wnd.UseNoneWindowStyle = true;
                 FullscreenVisible = Visibility.Collapsed;
+
+                IsFullscreen = true;
+                ControlController.Maximize(IsFullscreen);
                 return;
             }
-                
+
+            wnd.WindowState = _wndState;
+            wnd.WindowStyle = _wndStyle;
+            wnd.UseNoneWindowStyle = false;
+            wnd.ShowTitleBar = true;
+            wnd.Width = _wndWidth;
+            wnd.Height = _wndHeight;
             FullscreenVisible = Visibility.Visible;
+
+            IsFullscreen = false;
+            ControlController.Maximize(IsFullscreen);
+        }
+
+        private void MediaOpened(object? o)
+        {
+            Debug.Write(o?.GetType().Name);
+            if (o is not MediaOpenedEventArgs args)
+                return;
+            
+            TotalDuration = args.Info.Duration;
+            TrackTitle = $"{args.Info.MediaSource}";
+            IsPaused = false;
         }
 
         private void NotifySliderDataChanged()

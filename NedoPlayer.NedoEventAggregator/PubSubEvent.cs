@@ -77,3 +77,42 @@ public class PubSubEvent<T> : EventBase
         }
     }
 }
+
+public class PubSubEvent<T1, T2> : EventBase
+{
+    public SubscriptionToken Subscribe(Action<T1, T2> callback)
+    {
+        var newSubscription = new Subscription<T1, T2>(callback, new SubscriptionToken(Unsubscribe));
+
+        lock (Subscriptions)
+        {
+            Subscriptions.Add(newSubscription);
+        }
+        
+        return newSubscription.SubscriptionToken;
+    }
+    
+    public void Publish(T1 arg1, T2 arg2)
+    {
+        lock (Subscriptions)
+        {
+            foreach (var s in Subscriptions)
+            {
+                if (s is not Subscription<T1, T2> sub) continue;
+                
+                sub.Invoke(arg1, arg2);
+            }
+        }
+    }
+
+    public void Unsubscribe(SubscriptionToken token)
+    {
+        lock (Subscriptions)
+        {
+            var sub = Subscriptions.FirstOrDefault(x => x.SubscriptionToken == token);
+
+            if (sub != null)
+                Subscriptions.Remove(sub);
+        }
+    }
+}
