@@ -5,12 +5,7 @@ namespace NedoPlayer.Utils;
 
 public class ViewModelLocator
 {
-    private static readonly EventAggregator Aggregator = new EventAggregator();
-    public static IEventAggregator EventAggregator => Aggregator;
-    
     private MainViewModel? _mainViewModel;
-    private ControlViewModel? _controlViewModel;
 
-    public MainViewModel MainViewModel => _mainViewModel ??= new MainViewModel(Aggregator);
-    public ControlViewModel ControlViewModel => _controlViewModel ??= new ControlViewModel(Aggregator);
+    public MainViewModel MainViewModel => _mainViewModel ??= new MainViewModel(EventAggregator.Instance);
 }

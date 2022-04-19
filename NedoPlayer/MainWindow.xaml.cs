@@ -83,7 +83,7 @@ namespace NedoPlayer
 
         private void MainWindow_OnMouseMove(object sender, MouseEventArgs e)
         {
-            if (DataContext is not MainViewModel {FullscreenVisible: Visibility.Collapsed})
+            if (DataContext is not MainViewModel {IsFullscreen: true})
             {
                 Mouse.OverrideCursor = null;
                 VideoPlayerControl.Visibility = Visibility.Visible;

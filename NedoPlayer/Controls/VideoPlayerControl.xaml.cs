@@ -51,6 +51,15 @@ public partial class VideoPlayerControl : UserControl
     
     public static readonly DependencyProperty IsMutedProperty =
         DependencyProperty.Register("IsMuted", typeof(bool), typeof(VideoPlayerControl), new PropertyMetadata(false));
+    
+    public bool IsPaused
+    {
+        get => (bool) GetValue(IsPausedProperty);
+        set => SetValue(IsPausedProperty, value);
+    }
+    
+    public static readonly DependencyProperty IsPausedProperty =
+        DependencyProperty.Register("IsPaused", typeof(bool), typeof(VideoPlayerControl), new PropertyMetadata(false));
 
     public ICommand PlayPauseCommand
     {
@@ -78,6 +87,15 @@ public partial class VideoPlayerControl : UserControl
     
     public static readonly DependencyProperty MuteCommandProperty =
         DependencyProperty.Register("MuteCommand", typeof(ICommand), typeof(VideoPlayerControl), new UIPropertyMetadata(null));
+    
+    public ICommand OpenPlaylistCommand
+    {
+        get => (ICommand) GetValue(OpenPlaylistCommandProperty);
+        set => SetValue(OpenPlaylistCommandProperty, value);
+    }
+    
+    public static readonly DependencyProperty OpenPlaylistCommandProperty =
+        DependencyProperty.Register("OpenPlaylistCommand", typeof(ICommand), typeof(VideoPlayerControl), new UIPropertyMetadata(null));
 
     public VideoPlayerControl()
     {

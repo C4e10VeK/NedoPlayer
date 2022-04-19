@@ -18,19 +18,13 @@ public class MediaControlController
     public void PlayPause(object? s)
     {
         PlayPauseRequested?.Invoke(_mainViewModel, EventArgs.Empty);
-        _mainViewModel.TaskBarIcon = _mainViewModel switch
-        {
-            {IsPaused: true} => "./Resources/img/pause.png",
-            {IsPaused: false} => "./Resources/img/play.png",
-            _ => _mainViewModel.TaskBarIcon
-        };
     }
 
     public void Maximize(bool isFullscreen) => MaximizeRequested?.Invoke(_mainViewModel, isFullscreen);
 
-    public void Next(object? s) => 
-        NextRequested?.Invoke(_mainViewModel, string.Empty);
+    public void Next(string path) => NextRequested?.Invoke(_mainViewModel, path);
 
-    public void Close(object? s) => 
-        CloseRequested?.Invoke(_mainViewModel, EventArgs.Empty);
+    public void Prev(string path) => PrevRequested?.Invoke(_mainViewModel, path);
+
+    public void Close(object? s) => CloseRequested?.Invoke(_mainViewModel, EventArgs.Empty);
 }

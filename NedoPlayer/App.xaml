@@ -8,12 +8,13 @@
     <Application.Resources>
          <ResourceDictionary>
              <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/dark.blue.xaml" />
+                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/dark.blue.xaml" />
              </ResourceDictionary.MergedDictionaries>
              <utils:ViewModelLocator x:Key="ViewModelLocator" />
              <utils:BoolToPlayPauseKindConverter x:Key="BoolToPlayPauseKindConverter" />
+             <utils:BoolToPlayPauseImgConverter x:Key="BoolToPlayPauseImgConverter" />
              <utils:VolumeToVolumeKindConverter x:Key="VolumeToVolumeKindConverter" />
              <utils:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
              <utils:InverseBoolConverter x:Key="InverseBoolConverter" />

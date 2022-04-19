@@ -11,11 +11,103 @@
              mc:Ignorable="d"
              d:DesignHeight="60" d:DesignWidth="800"
              >
+    <UserControl.Resources>
+        <Style x:Key="SliderRepeatButton" TargetType="RepeatButton">
+        <Setter Property="SnapsToDevicePixels" Value="true" />
+        <Setter Property="OverridesDefaultStyle" Value="true" />
+        <Setter Property="IsTabStop" Value="false" />
+        <Setter Property="Focusable" Value="false" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RepeatButton">
+                    <Border x:Name="Border" BorderThickness="1" BorderBrush="{DynamicResource MahApps.Brushes.Gray3}" Background="{DynamicResource MahApps.Brushes.Gray3}" Height="3"/>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Gray6}"></Setter>
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource MahApps.Brushes.Gray6}"></Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SliderRepeatButton1" TargetType="RepeatButton">
+        <Setter Property="SnapsToDevicePixels" Value="true" />
+        <Setter Property="OverridesDefaultStyle" Value="true" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RepeatButton">
+                    <Border x:Name="Border" SnapsToDevicePixels="True" Background="{DynamicResource MahApps.Brushes.AccentBase}"  BorderThickness="1" BorderBrush="{DynamicResource MahApps.Brushes.AccentBase}" Height="3"/>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Gray6}"></Setter>
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource MahApps.Brushes.Gray6}"></Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SliderThumb" TargetType="Thumb">
+        <Setter Property="SnapsToDevicePixels" Value="true" />
+        <Setter Property="OverridesDefaultStyle" Value="true" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Thumb">
+                    <Ellipse x:Name="Ellipse" Height="15" Width="15" Fill="{DynamicResource MahApps.Brushes.AccentBase}"></Ellipse>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Ellipse" Property="Fill" Value="{DynamicResource MahApps.Brushes.Gray1}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Ellipse" Property="Fill" Value="{DynamicResource MahApps.Brushes.Gray6}"></Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <ControlTemplate x:Key="Slider"  TargetType="Slider">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" MinHeight="{TemplateBinding MinHeight}" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Track Grid.Row="1" x:Name="PART_Track"   >
+                <Track.DecreaseRepeatButton>
+                    <RepeatButton Style="{StaticResource SliderRepeatButton1}"  Command="Slider.DecreaseLarge" />
+                </Track.DecreaseRepeatButton>
+                <Track.Thumb>
+                    <Thumb Style="{StaticResource SliderThumb}"  />
+                </Track.Thumb>
+                <Track.IncreaseRepeatButton>
+                    <RepeatButton Style="{StaticResource SliderRepeatButton}" Command="Slider.IncreaseLarge" />
+                </Track.IncreaseRepeatButton>
+            </Track>
+        </Grid>            
+    </ControlTemplate>
+
+    <Style x:Key="HorizontalVolumeSlider" TargetType="Slider">
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="SnapsToDevicePixels" Value="true" />
+        <Setter Property="OverridesDefaultStyle" Value="true" />
+        <Style.Triggers>
+            <Trigger Property="Orientation" Value="Horizontal">
+                <Setter Property="MinHeight" Value="21" />
+                <Setter Property="MinWidth" Value="104" />
+                <Setter Property="Template" Value="{StaticResource Slider}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    </UserControl.Resources>
     <Grid>
-        <Grid
-            VerticalAlignment="Bottom"
-            Height="60"
-            Background="{StaticResource MahApps.Brushes.Control.Background}">
+        <Grid VerticalAlignment="Bottom"
+              Height="60"
+              Background="{StaticResource MahApps.Brushes.Control.Background}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
@@ -23,19 +115,20 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
                 <ColumnDefinition Width="150"></ColumnDefinition>
             </Grid.ColumnDefinitions>
 
             <!-- Video playback position control/status -->
-            <utils:FormattedTimeSlider Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
-                                       Margin="5 0" Height="10"
+            <utils:FormattedTimeSlider Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
+                                       Margin="5 0" Height="10" VerticalAlignment="Center"
                                        Style="{DynamicResource MahApps.Styles.Slider.Flat}"
                                        Minimum="0" Maximum="{Binding PlaybackEndTime.TotalSeconds, ElementName=This}"
                                        AutoToolTipPlacement="TopLeft"
                                        AutoToolTipFormat="{}{0:hh\:mm\:ss}"
                                        Value="{Binding PositionSecond, ElementName=This, Mode=TwoWay}" />
-            <StackPanel Grid.Row="0" Grid.Column="2"
-                        Orientation="Horizontal" HorizontalAlignment="Center"
+            <StackPanel Grid.Row="0" Grid.Column="3"
+                        Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"
                         Margin="5 0">
                 <TextBlock>
                     <TextBlock.Text>
@@ -47,38 +140,43 @@
                 </TextBlock>
             </StackPanel>
             <!-- Video control button -->
-            <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
+            <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4"
                         Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Button Width="25" Height="25" Margin="5 0" ToolTip="{x:Static p:Localization.PrevMedia}"
+                <Button Width="35" Height="35" Margin="5 0" ToolTip="{x:Static p:Localization.PrevMedia}"
                         Style="{DynamicResource MahApps.Styles.Button.Circle}">
-                    <iconPacks:PackIconModern Width="15" Height="15" Kind="ControlRewindVariant" />
+                    <iconPacks:PackIconModern Width="20" Height="20" Margin="0 0 0 1" Kind="ControlRewindVariant" />
                 </Button>
-                <Button Width="30" Height="30" Margin="5 0" ToolTip="{x:Static p:Localization.PlayPause}"
+                <Button Width="35" Height="35" Margin="5 0" ToolTip="{x:Static p:Localization.PlayPause}"
                         HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                         Style="{DynamicResource MahApps.Styles.Button.Circle}"
                         Command="{Binding PlayPauseCommand, ElementName=This}">
                     <iconPacks:PackIconMaterial Margin="1 0 0 1"
+                                                Width="20" Height="20"
                                                 VerticalAlignment="Center" HorizontalAlignment="Center"
                                                 Kind="{Binding IsPaused, Converter={StaticResource BoolToPlayPauseKindConverter}}"
                                                 DataContext="{Binding MainViewModel, Source={StaticResource ViewModelLocator}}" />
+                    <!-- <Image Width="20" Margin="1 0 0 0" -->
+                           <!-- VerticalAlignment="Center" HorizontalAlignment="Center" -->
+                           <!-- RenderOptions.BitmapScalingMode="HighQuality" -->
+                           <!-- Source="{Binding IsPaused, ElementName=This, Converter={StaticResource BoolToPlayPauseImgConverter}}" /> -->
                 </Button>
-                <Button Width="25" Height="25" Margin="5 0" ToolTip="{x:Static p:Localization.NextMedia}"
+                <Button Width="35" Height="35" Margin="5 0" ToolTip="{x:Static p:Localization.NextMedia}"
                         Style="{DynamicResource MahApps.Styles.Button.Circle}">
-                    <iconPacks:PackIconModern Width="15" Height="15" Kind="ControlFastforwardVariant" />
+                    <iconPacks:PackIconModern Width="20" Height="20" Margin="0 0 0 1" Kind="ControlFastforwardVariant" />
                 </Button>
             </StackPanel>
-            <StackPanel Grid.Row="1" Grid.Column="2"
-                        Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <StackPanel Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2"
+                        Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
                         <ColumnDefinition Width="*"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Margin="0 0 5 0" Width="25" Height="25" ToolTip="{x:Static p:Localization.Mute}"
+                    <Button Grid.Column="0" Margin="0 0 5 0" Width="35" Height="35" ToolTip="{x:Static p:Localization.Mute}"
                             VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                            Style="{DynamicResource MahApps.Styles.Button.Circle}"
+                            Style="{DynamicResource MahApps.Styles.Button.Split}"
                             Command="{Binding MuteCommand, ElementName=This}">
-                        <iconPacks:PackIconModern>
+                        <iconPacks:PackIconModern Width="20" Height="20">
                             <iconPacks:PackIconModern.Kind>
                                 <MultiBinding Converter="{StaticResource VolumeToVolumeKindConverter}">
                                     <Binding Path="Volume" ElementName="This" />
@@ -87,8 +185,9 @@
                             </iconPacks:PackIconModern.Kind>
                         </iconPacks:PackIconModern>
                     </Button>
-                    <Slider Grid.Column="1" Width="50"
+                    <Slider Grid.Column="1" Width="50" Height="10"
                             Minimum="0" Maximum="100"
+                            Style="{StaticResource HorizontalVolumeSlider}"
                             Value="{Binding Volume, ElementName=This}"
                             AutoToolTipPlacement="TopLeft"
                             HorizontalAlignment="Stretch"
@@ -96,14 +195,15 @@
                     </Slider>
                 </Grid>
                 <Button VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Playlist"
-                        Width="25" Height="25" Margin="5 0"
-                        Style="{DynamicResource MahApps.Styles.Button.Circle}">
-                    <iconPacks:PackIconModern Width="15" Kind="List" />
+                        Width="35" Height="35" Margin="5 0"
+                        Style="{DynamicResource MahApps.Styles.Button.Circle}"
+                        Command="{Binding OpenPlaylistCommand, ElementName=This}">
+                    <iconPacks:PackIconModern Kind="List" />
                 </Button>
-                <Button x:Name="BtnMax" Width="25" Height="25" Margin="5 0" ToolTip="Maximize"
+                <Button Width="35" Height="35" Margin="5 0" ToolTip="Maximize"
                         Style="{DynamicResource MahApps.Styles.Button.Circle}"
                         Command="{Binding MaximizeCommand, ElementName=This}">
-                    <iconPacks:PackIconModern Width="15" Kind="WindowMaximize" />
+                    <iconPacks:PackIconModern Kind="WindowMaximize" />
                 </Button>
             </StackPanel>
         </Grid>
