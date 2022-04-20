@@ -97,6 +97,24 @@ public partial class VideoPlayerControl : UserControl
     public static readonly DependencyProperty OpenPlaylistCommandProperty =
         DependencyProperty.Register("OpenPlaylistCommand", typeof(ICommand), typeof(VideoPlayerControl), new UIPropertyMetadata(null));
 
+    public ICommand NextMediaCommand
+    {
+        get => (ICommand)GetValue(NextMediaCommandProperty);
+        set => SetValue(NextMediaCommandProperty, value);
+    }
+
+    public static readonly DependencyProperty NextMediaCommandProperty =
+        DependencyProperty.Register("NextMediaCommand", typeof(ICommand), typeof(VideoPlayerControl), new UIPropertyMetadata(null));
+
+    public ICommand PrevMediaCommand
+    {
+        get => (ICommand)GetValue(PrevMediaCommandProperty);
+        set => SetValue(PrevMediaCommandProperty, value);
+    }
+
+    public static readonly DependencyProperty PrevMediaCommandProperty =
+        DependencyProperty.Register("PrevMediaCommand", typeof(ICommand), typeof(VideoPlayerControl), new UIPropertyMetadata(null));
+
     public VideoPlayerControl()
     {
         InitializeComponent();

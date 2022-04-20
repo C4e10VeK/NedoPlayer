@@ -143,7 +143,8 @@
             <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4"
                         Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Button Width="35" Height="35" Margin="5 0" ToolTip="{x:Static p:Localization.PrevMedia}"
-                        Style="{DynamicResource MahApps.Styles.Button.Circle}">
+                        Style="{DynamicResource MahApps.Styles.Button.Circle}"
+                        Command="{Binding PrevMediaCommand, ElementName=This}">
                     <iconPacks:PackIconModern Width="20" Height="20" Margin="0 0 0 1" Kind="ControlRewindVariant" />
                 </Button>
                 <Button Width="35" Height="35" Margin="5 0" ToolTip="{x:Static p:Localization.PlayPause}"
@@ -161,7 +162,8 @@
                            <!-- Source="{Binding IsPaused, ElementName=This, Converter={StaticResource BoolToPlayPauseImgConverter}}" /> -->
                 </Button>
                 <Button Width="35" Height="35" Margin="5 0" ToolTip="{x:Static p:Localization.NextMedia}"
-                        Style="{DynamicResource MahApps.Styles.Button.Circle}">
+                        Style="{DynamicResource MahApps.Styles.Button.Circle}"
+                        Command="{Binding NextMediaCommand, ElementName=This}">
                     <iconPacks:PackIconModern Width="20" Height="20" Margin="0 0 0 1" Kind="ControlFastforwardVariant" />
                 </Button>
             </StackPanel>

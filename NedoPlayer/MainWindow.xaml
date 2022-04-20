@@ -43,6 +43,7 @@
         <KeyBinding Gesture="CTRL+Q" Command="{Binding CloseCommand}"></KeyBinding>
         <KeyBinding Gesture="CTRL+O" Command="{Binding}"></KeyBinding>
         <KeyBinding Gesture="CTRL+SHIFT+O" Command="{Binding}"></KeyBinding>
+        <KeyBinding Gesture="SPACE" Command="{Binding PlayPauseCommand}"></KeyBinding>
     </mah:MetroWindow.InputBindings>
     <mah:MetroWindow.Flyouts>
         <mah:FlyoutsControl>
@@ -50,9 +51,7 @@
                         Width="400"
                         IsOpen="{Binding IsPlayListOpened}">
                 <Grid>
-                    <controls:PlaylistControl PlaylistSource="{Binding Playlist}">
-                        
-                    </controls:PlaylistControl>
+                    <controls:PlaylistControl PlaylistSource="{Binding Playlist}" />
                 </Grid>
             </mah:Flyout>
         </mah:FlyoutsControl>
@@ -65,13 +64,16 @@
         </Grid.RowDefinitions>
         <Menu Grid.Row="0" Visibility="{Binding IsFullscreen, Converter={StaticResource BoolToVisibilityConverter}}">
             <MenuItem Header="{x:Static p:Localization.Media}">
-                <MenuItem Header="{x:Static p:Localization.OpenFile}" InputGestureText="Ctrl+O"></MenuItem>
+                <MenuItem Header="{x:Static p:Localization.OpenFile}" InputGestureText="Ctrl+O"
+                          Command="{Binding OpenFileCommand}"></MenuItem>
                 <MenuItem Header="{x:Static p:Localization.OpenFolder}" InputGestureText="Ctrl+Shift+O"></MenuItem>
                 <Separator />
                 <MenuItem Header="{x:Static p:Localization.Exit}" Command="{Binding CloseCommand}" InputGestureText="Ctrl+Q" />
             </MenuItem>
             <MenuItem Header="{x:Static p:Localization.Player}">
-                <MenuItem Header="{x:Static p:Localization.PlayPause}" Command="{Binding PlayPauseCommand}">
+                <MenuItem Header="{x:Static p:Localization.PlayPause}"
+                          InputGestureText="Space"
+                          Command="{Binding PlayPauseCommand}">
                     <MenuItem.Icon>
                         <iconPacks:PackIconMaterial Width="15" Height="15" Kind="{Binding IsPaused, Converter={StaticResource BoolToPlayPauseKindConverter}}" />
                     </MenuItem.Icon>
@@ -145,6 +147,8 @@
                                      PlayPauseCommand="{Binding PlayPauseCommand}"
                                      MaximizeCommand="{Binding MaximizeCommand}"
                                      MuteCommand="{Binding MuteCommand}"
-                                     OpenPlaylistCommand="{Binding OpenPlaylistCommand}" />
+                                     OpenPlaylistCommand="{Binding OpenPlaylistCommand}" 
+                                     NextMediaCommand="{Binding NextMediaCommand}"
+                                     PrevMediaCommand="{Binding PreviousMediaCommand}"/>
     </Grid>
 </mah:MetroWindow>

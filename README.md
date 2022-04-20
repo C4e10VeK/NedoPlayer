@@ -7,8 +7,10 @@
 - [X] Add event aggregator
 - [X] Event aggregator implementation
 - [ ] Add playlist
-- [ ] Add base command for binding
-- [ ] Add base menu
+- [x] Add base command for binding
+- [x] Add base menu
+- [ ] Add popup menu
+- [ ] Add repeat track
 
 ###In future:
 - [ ] Rewrite media-player window and control design

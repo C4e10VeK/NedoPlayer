@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using MahApps.Metro.Controls;
+using Microsoft.WindowsAPICodePack.Shell;
 using NedoPlayer.Controllers;
 using NedoPlayer.Models;
 using NedoPlayer.NedoEventAggregator;
@@ -17,6 +20,8 @@ namespace NedoPlayer.ViewModels
     public sealed class MainViewModel : BaseViewModel
     {
         public MediaControlController ControlController { get; }
+        private IOService _fileDialogService;
+        private int _playedMediaIndex;
 
         private string _trackTitle;
         public string TrackTitle
@@ -142,9 +147,14 @@ namespace NedoPlayer.ViewModels
         public ICommand SeekStartCommand { get; }
         public ICommand SeekEndCommand { get; }
 
+        public ICommand OpenFileCommand { get; }
+        public ICommand NextMediaCommand { get; }
+        public ICommand PreviousMediaCommand { get; }
+
         public MainViewModel(IEventAggregator aggregator) : base(aggregator)
         {
             ControlController = new MediaControlController(this);
+            _fileDialogService = new FileService();
             _trackTitle = "";
             _isPaused = true;
             _playerTimeToEnd = TimeSpan.FromSeconds(0);
@@ -152,14 +162,10 @@ namespace NedoPlayer.ViewModels
             _volume = 100;
             _isMuted = false;
             _isPlayListOpened = false;
+            _playedMediaIndex = 0;
             _playlist = new Playlist
             {
-                MediaInfos = new ObservableCollection<MediaInfo>
-                {
-                    new() {Duration = TimeSpan.FromSeconds(635), GroupId = 0, Path = "no", Title = "Первый"},
-                    new() {Duration = TimeSpan.FromSeconds(635), GroupId = 1, Path = "no", Title = "Второй"},
-                    new() {Duration = TimeSpan.FromSeconds(635), GroupId = 0, Path = "no", Title = "Третий"}
-                },
+                MediaInfos = new ObservableCollection<MediaInfo>(),
                 TotalDuration = TimeSpan.FromSeconds(635 * 3)
             };
 
@@ -175,6 +181,10 @@ namespace NedoPlayer.ViewModels
                 ControlController.PlayPause(o);
             });
             SeekEndCommand = new RelayCommand(ControlController.PlayPause);
+            OpenFileCommand = new RelayCommand(OpenMediaFile);
+
+            NextMediaCommand = new RelayCommand(NextMediaFile, _ => _playedMediaIndex < Playlist?.MediaInfos?.Count);
+            PreviousMediaCommand = new RelayCommand(PreviousMediaFile, _ => _playedMediaIndex > 0);
         }
 
         private void Maximize(object? s)
@@ -202,15 +212,48 @@ namespace NedoPlayer.ViewModels
             ControlController.Maximize(IsFullscreen);
         }
 
+        private void NextMediaFile(object? o)
+        {
+
+        }
+
+        private void PreviousMediaFile(object? o)
+        {
+
+        }
+
         private void MediaOpened(object? o)
         {
-            Debug.Write(o?.GetType().Name);
             if (o is not MediaOpenedEventArgs args)
                 return;
             
             TotalDuration = args.Info.Duration;
             TrackTitle = $"{args.Info.MediaSource}";
             IsPaused = false;
+        }
+
+        private void OpenMediaFile(object? o)
+        {
+            string filePath = _fileDialogService.OpenFileDialog(this, @"C:\");
+            OpenMediaFileInternal(filePath);
+        }
+
+        public void OpenMediaFileInternal(string filePath)
+        {
+            if (string.IsNullOrWhiteSpace(filePath)) return;
+            var title = Path.GetFileName(filePath);
+
+
+            var tempMediaList = new ObservableCollection<MediaInfo>(Playlist.MediaInfos.OrderBy(x => x));
+            var groupList = Playlist?.MediaInfos.Where(x => x.Path == filePath.Replace(title, "")).ToList();
+            var groupId = tempMediaList?.Count == 0 ?
+                0 : groupList?.Count <= 0 ? tempMediaList?.Last().GroupId + 1 : groupList.First().GroupId;
+
+            using var shell = ShellObject.FromParsingName(filePath);
+            var prop = shell.Properties.System.Media.Duration;
+            var duration = prop.Value ?? 0;
+            var mediaAdd = new MediaInfo(groupId.GetValueOrDefault(), filePath.Replace(title, ""), title, TimeSpan.FromTicks((long)duration));
+            Playlist?.MediaInfos?.Add(mediaAdd);
         }
 
         private void NotifySliderDataChanged()

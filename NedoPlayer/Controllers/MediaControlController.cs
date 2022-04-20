@@ -7,6 +7,7 @@ public class MediaControlController
 {
     public event EventHandler? CloseRequested;
     public event EventHandler? PlayPauseRequested;
+    public event EventHandler<string>? OpenMediaFileRequested;
     public event EventHandler<bool>? MaximizeRequested;
     public event EventHandler<string>? NextRequested;
     public event EventHandler<string>? PrevRequested;
@@ -15,10 +16,7 @@ public class MediaControlController
 
     public MediaControlController(MainViewModel viewModel) => _mainViewModel = viewModel;
 
-    public void PlayPause(object? s)
-    {
-        PlayPauseRequested?.Invoke(_mainViewModel, EventArgs.Empty);
-    }
+    public void PlayPause(object? s) => PlayPauseRequested?.Invoke(_mainViewModel, EventArgs.Empty);
 
     public void Maximize(bool isFullscreen) => MaximizeRequested?.Invoke(_mainViewModel, isFullscreen);
 
@@ -27,4 +25,6 @@ public class MediaControlController
     public void Prev(string path) => PrevRequested?.Invoke(_mainViewModel, path);
 
     public void Close(object? s) => CloseRequested?.Invoke(_mainViewModel, EventArgs.Empty);
+
+    public void OpenMdeiaFile(string filePath) => OpenMediaFileRequested?.Invoke(_mainViewModel, filePath);
 }

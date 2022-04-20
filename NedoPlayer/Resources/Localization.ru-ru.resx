@@ -50,4 +50,7 @@
     <data name="PrevMedia" xml:space="preserve">
         <value>Предыдущий</value>
     </data>
+    <data name="TotalDuration" xml:space="preserve">
+        <value>Общая продолжительность</value>
+    </data>
 </root>

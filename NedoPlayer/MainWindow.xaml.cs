@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -33,15 +34,18 @@ namespace NedoPlayer
                     VideoPlayerControl.Visibility = Visibility.Collapsed;
                 });
             }; 
+
+            if (App.Args != null && File.Exists(App.Args[0]))
+            {
+                (DataContext as MainViewModel)?.OpenMediaFileInternal(App.Args[0]);
+                (DataContext as MainViewModel)?.ControlController.OpenMdeiaFile(App.Args[0]);
+            }
         }
 
 
         private void InitMediaPlayer()
         {
             Unosquare.FFME.Library.FFmpegDirectory = @".\lib";
-
-            if (App.Args != null)
-                VideoPlayer.Open(new Uri(App.Args[0]));
 
             if (DataContext is not MainViewModel dt) return;
             dt.ControlController.PlayPauseRequested += async (mvm, _) =>
@@ -73,6 +77,16 @@ namespace NedoPlayer
                 
                 _timerForHide.IsEnabled = false;
                 VideoPlayerControl.SetValue(Grid.RowProperty, 2);
+            };
+
+            dt.ControlController.OpenMediaFileRequested += async (vm, path) => 
+            {
+                if (VideoPlayer.IsOpen)
+                {
+                    (vm as MainViewModel)?.ControlController.PlayPause(null);
+                    await VideoPlayer.Close();
+                }
+                await VideoPlayer.Open(new Uri(path));
             };
         }
 

@@ -176,5 +176,14 @@ namespace NedoPlayer.Resources {
                 return ResourceManager.GetString("Stop", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Total duration.
+        /// </summary>
+        public static string TotalDuration {
+            get {
+                return ResourceManager.GetString("TotalDuration", resourceCulture);
+            }
+        }
     }
 }

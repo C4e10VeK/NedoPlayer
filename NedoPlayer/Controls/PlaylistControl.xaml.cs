@@ -18,6 +18,26 @@ public partial class PlaylistControl
         DependencyProperty.Register("PlaylistSource", typeof(Playlist), typeof(PlaylistControl),
             new PropertyMetadata(null));
     
+    public MediaInfo SelectedMedia
+    {
+        get => (MediaInfo) GetValue(SelectedMediaProperty);
+        set => SetValue(SelectedMediaProperty, value);
+    }
+
+    public static readonly DependencyProperty SelectedMediaProperty =
+        DependencyProperty.Register("SelectedMedia", typeof(MediaInfo), typeof(PlaylistControl),
+            new PropertyMetadata(null));
+    
+    public int SelectedMediaIndex
+    {
+        get => (int) GetValue(SelectedMediaIndexProperty);
+        set => SetValue(SelectedMediaIndexProperty, value);
+    }
+
+    public static readonly DependencyProperty SelectedMediaIndexProperty =
+        DependencyProperty.Register("SelectedMediaIndex", typeof(int), typeof(PlaylistControl),
+            new PropertyMetadata(-1));
+    
     public PlaylistControl()
     {
         InitializeComponent();
@@ -25,10 +45,8 @@ public partial class PlaylistControl
 
     private void FrameworkElement_OnSizeChanged(object sender, SizeChangedEventArgs e)
     {
-        if (sender is not ListView listView)
+        if (sender is not ListView {View: GridView gridView} listView)
             return;
-        
-        var gridView = listView.View as GridView;
 
         var workWidth = listView.ActualWidth - SystemParameters.VerticalScrollBarWidth;
         var col1 = 0.6;
