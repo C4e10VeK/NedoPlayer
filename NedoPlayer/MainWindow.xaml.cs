@@ -35,11 +35,15 @@ namespace NedoPlayer
                 });
             };
 
+            OpenMediaFromArgs();
+        }
+
+        private void OpenMediaFromArgs()
+        {
             if (App.Args == null || !File.Exists(App.Args[0]) || DataContext is not MainViewModel dt) return;
             dt.OpenMediaFileInternal(App.Args[0]);
             dt.ControlController.OpenMdeiaFile(App.Args[0]);
         }
-
 
         private void InitMediaPlayer()
         {
