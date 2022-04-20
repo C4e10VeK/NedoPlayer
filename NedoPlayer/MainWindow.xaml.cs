@@ -33,13 +33,11 @@ namespace NedoPlayer
                     Mouse.OverrideCursor = Cursors.None;
                     VideoPlayerControl.Visibility = Visibility.Collapsed;
                 });
-            }; 
+            };
 
-            if (App.Args != null && File.Exists(App.Args[0]))
-            {
-                (DataContext as MainViewModel)?.OpenMediaFileInternal(App.Args[0]);
-                (DataContext as MainViewModel)?.ControlController.OpenMdeiaFile(App.Args[0]);
-            }
+            if (App.Args == null || !File.Exists(App.Args[0]) || DataContext is not MainViewModel dt) return;
+            dt.OpenMediaFileInternal(App.Args[0]);
+            dt.ControlController.OpenMdeiaFile(App.Args[0]);
         }
 
 

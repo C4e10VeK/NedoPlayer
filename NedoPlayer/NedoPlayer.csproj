@@ -6,10 +6,10 @@
         <UseWPF>true</UseWPF>
         <ApplicationIcon>Resources\img\xws0HqMaSsI.ico</ApplicationIcon>
         <LangVersion>10</LangVersion>
-        <TargetFrameworks>net48;net6.0-windows</TargetFrameworks>
         <AssemblyVersion>0.5.0</AssemblyVersion>
         <NeutralLanguage>en-US</NeutralLanguage>
         <PlatformTarget>x64</PlatformTarget>
+        <TargetFramework>net48</TargetFramework>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0-windows|AnyCPU'">

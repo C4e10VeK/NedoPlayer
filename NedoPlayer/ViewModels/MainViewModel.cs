@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -20,7 +19,7 @@ namespace NedoPlayer.ViewModels
     public sealed class MainViewModel : BaseViewModel
     {
         public MediaControlController ControlController { get; }
-        private IOService _fileDialogService;
+        private readonly IOService? _fileDialogService;
         private int _playedMediaIndex;
 
         private string _trackTitle;
