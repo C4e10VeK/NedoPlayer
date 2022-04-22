@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 
-namespace NedoPlayer.Utils;
+namespace NedoPlayer.Utils.Converters;
 
-public class InverseBoolConverter : IValueConverter
+public class BoolToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is not bool val)
-            throw new InvalidOperationException("Не верный тип. Должен быть bool.");
+            return Visibility.Visible;
 
-        return !val;
+        return val ? Visibility.Collapsed : Visibility.Visible;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

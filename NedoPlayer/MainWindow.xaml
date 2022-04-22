@@ -63,40 +63,40 @@
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <Menu Grid.Row="0" Visibility="{Binding IsFullscreen, Converter={StaticResource BoolToVisibilityConverter}}">
-            <MenuItem Header="{x:Static p:Localization.Media}">
-                <MenuItem Header="{x:Static p:Localization.OpenFile}" InputGestureText="Ctrl+O"
+            <MenuItem Header="{x:Static p:Resource.Media}">
+                <MenuItem Header="{x:Static p:Resource.OpenFile}" InputGestureText="Ctrl+O"
                           Command="{Binding OpenFileCommand}"></MenuItem>
-                <MenuItem Header="{x:Static p:Localization.OpenFolder}" InputGestureText="Ctrl+Shift+O"></MenuItem>
+                <MenuItem Header="{x:Static p:Resource.OpenFolder}" InputGestureText="Ctrl+Shift+O"></MenuItem>
                 <Separator />
-                <MenuItem Header="{x:Static p:Localization.Exit}" Command="{Binding CloseCommand}" InputGestureText="Ctrl+Q" />
+                <MenuItem Header="{x:Static p:Resource.Exit}" Command="{Binding CloseCommand}" InputGestureText="Ctrl+Q" />
             </MenuItem>
-            <MenuItem Header="{x:Static p:Localization.Player}">
-                <MenuItem Header="{x:Static p:Localization.PlayPause}"
+            <MenuItem Header="{x:Static p:Resource.Player}">
+                <MenuItem Header="{x:Static p:Resource.PlayPause}"
                           InputGestureText="Space"
                           Command="{Binding PlayPauseCommand}">
                     <MenuItem.Icon>
                         <iconPacks:PackIconMaterial Width="15" Height="15" Kind="{Binding IsPaused, Converter={StaticResource BoolToPlayPauseKindConverter}}" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="{x:Static p:Localization.Stop}">
+                <MenuItem Header="{x:Static p:Resource.Stop}">
                     <MenuItem.Icon>
                         <iconPacks:PackIconModern Width="15" Height="15" Kind="ControlStop" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="{x:Static p:Localization.NextMedia}">
+                <MenuItem Header="{x:Static p:Resource.NextMedia}">
                     <MenuItem.Icon>
                         <iconPacks:PackIconModern Width="15" Height="15" Kind="ControlFastforwardVariant" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="{x:Static p:Localization.PrevMedia}">
+                <MenuItem Header="{x:Static p:Resource.PrevMedia}">
                     <MenuItem.Icon>
                         <iconPacks:PackIconModern Width="15" Height="15" Kind="ControlRewindVariant" />
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator/>
             </MenuItem>
-            <MenuItem Header="{x:Static p:Localization.Audio}">
-                <MenuItem Header="{x:Static p:Localization.Mute}" Command="{Binding MuteCommand}">
+            <MenuItem Header="{x:Static p:Resource.Audio}">
+                <MenuItem Header="{x:Static p:Resource.Mute}" Command="{Binding MuteCommand}">
                     <MenuItem.Icon>
                         <iconPacks:PackIconModern Width="15" Height="15">
                             <iconPacks:PackIconModern.Kind>
@@ -110,10 +110,10 @@
                 </MenuItem>
                 <Separator/>
             </MenuItem>
-            <MenuItem Header="{x:Static p:Localization.Help}">
-                <MenuItem Header="{x:Static p:Localization.Help}"></MenuItem>
+            <MenuItem Header="{x:Static p:Resource.Help}">
+                <MenuItem Header="{x:Static p:Resource.Help}"></MenuItem>
                 <Separator />
-                <MenuItem Header="{x:Static p:Localization.About}"></MenuItem>
+                <MenuItem Header="{x:Static p:Resource.About}"></MenuItem>
             </MenuItem>
         </Menu>
         <ffme:MediaElement Grid.Row="1" x:Name="VideoPlayer"

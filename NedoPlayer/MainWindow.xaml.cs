@@ -42,7 +42,7 @@ namespace NedoPlayer
         {
             if (App.Args == null || !File.Exists(App.Args[0]) || DataContext is not MainViewModel dt) return;
             dt.OpenMediaFileInternal(App.Args[0]);
-            dt.ControlController.OpenMdeiaFile(App.Args[0]);
+            dt.MediaControlController.OpenMediaFile(App.Args[0]);
         }
 
         private void InitMediaPlayer()
@@ -50,7 +50,7 @@ namespace NedoPlayer
             Unosquare.FFME.Library.FFmpegDirectory = @".\lib";
 
             if (DataContext is not MainViewModel dt) return;
-            dt.ControlController.PlayPauseRequested += async (mvm, _) =>
+            dt.MediaControlController.PlayPauseRequested += async (mvm, _) =>
             {
                 if (mvm is not MainViewModel viewModel) return;
                 if (!VideoPlayer.IsOpen) return;
@@ -66,9 +66,9 @@ namespace NedoPlayer
                 viewModel.IsPaused = true;
             };
 
-            dt.ControlController.CloseRequested += (_, _) => Close();
+            dt.MediaControlController.CloseRequested += (_, _) => Close();
 
-            dt.ControlController.MaximizeRequested += (_, fullscreen) =>
+            dt.MediaControlController.MaximizeRequested += (_, fullscreen) =>
             {
                 if (fullscreen)
                 {
@@ -81,11 +81,11 @@ namespace NedoPlayer
                 VideoPlayerControl.SetValue(Grid.RowProperty, 2);
             };
 
-            dt.ControlController.OpenMediaFileRequested += async (vm, path) => 
+            dt.MediaControlController.OpenMediaFileRequested += async (vm, path) => 
             {
                 if (VideoPlayer.IsOpen)
                 {
-                    (vm as MainViewModel)?.ControlController.PlayPause(null);
+                    (vm as MainViewModel)?.MediaControlController.PlayPause();
                     await VideoPlayer.Close();
                 }
                 await VideoPlayer.Open(new Uri(path));

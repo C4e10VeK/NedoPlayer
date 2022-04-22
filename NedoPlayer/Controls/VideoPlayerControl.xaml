@@ -142,12 +142,12 @@
             <!-- Video control button -->
             <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4"
                         Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Button Width="35" Height="35" Margin="5 0" ToolTip="{x:Static p:Localization.PrevMedia}"
+                <Button Width="35" Height="35" Margin="5 0" ToolTip="{x:Static p:Resource.PrevMedia}"
                         Style="{DynamicResource MahApps.Styles.Button.Circle}"
                         Command="{Binding PrevMediaCommand, ElementName=This}">
                     <iconPacks:PackIconModern Width="20" Height="20" Margin="0 0 0 1" Kind="ControlRewindVariant" />
                 </Button>
-                <Button Width="35" Height="35" Margin="5 0" ToolTip="{x:Static p:Localization.PlayPause}"
+                <Button Width="35" Height="35" Margin="5 0" ToolTip="{x:Static p:Resource.PlayPause}"
                         HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                         Style="{DynamicResource MahApps.Styles.Button.Circle}"
                         Command="{Binding PlayPauseCommand, ElementName=This}">
@@ -161,7 +161,7 @@
                            <!-- RenderOptions.BitmapScalingMode="HighQuality" -->
                            <!-- Source="{Binding IsPaused, ElementName=This, Converter={StaticResource BoolToPlayPauseImgConverter}}" /> -->
                 </Button>
-                <Button Width="35" Height="35" Margin="5 0" ToolTip="{x:Static p:Localization.NextMedia}"
+                <Button Width="35" Height="35" Margin="5 0" ToolTip="{x:Static p:Resource.NextMedia}"
                         Style="{DynamicResource MahApps.Styles.Button.Circle}"
                         Command="{Binding NextMediaCommand, ElementName=This}">
                     <iconPacks:PackIconModern Width="20" Height="20" Margin="0 0 0 1" Kind="ControlFastforwardVariant" />
@@ -174,7 +174,7 @@
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
                         <ColumnDefinition Width="*"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Margin="0 0 5 0" Width="35" Height="35" ToolTip="{x:Static p:Localization.Mute}"
+                    <Button Grid.Column="0" Margin="0 0 5 0" Width="35" Height="35" ToolTip="{x:Static p:Resource.Mute}"
                             VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
                             Style="{DynamicResource MahApps.Styles.Button.Split}"
                             Command="{Binding MuteCommand, ElementName=This}">

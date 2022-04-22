@@ -4,7 +4,7 @@ using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using MahApps.Metro.IconPacks;
 
-namespace NedoPlayer.Utils;
+namespace NedoPlayer.Utils.Converters;
 
 public class BoolToPlayPauseKindConverter : IValueConverter
 {

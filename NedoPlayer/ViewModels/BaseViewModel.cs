@@ -7,11 +7,9 @@ namespace NedoPlayer.ViewModels
 {
     public abstract class BaseViewModel : INotifyPropertyChanged
     {
-        private readonly IEventAggregator _aggregator;
+        protected IEventAggregator Aggregator { get; }
 
-        protected IEventAggregator Aggregator => _aggregator;
-
-        protected BaseViewModel(IEventAggregator aggregator) => _aggregator = aggregator;
+        protected BaseViewModel(IEventAggregator aggregator) => Aggregator = aggregator;
         
         public event PropertyChangedEventHandler? PropertyChanged;
 

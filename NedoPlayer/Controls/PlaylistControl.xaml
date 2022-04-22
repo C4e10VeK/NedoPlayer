@@ -178,7 +178,7 @@
                    FontWeight="Bold">
             <TextBlock.Text>
                 <MultiBinding StringFormat="{}{0}: {1:hh\:mm\:ss}">
-                    <Binding Source="{x:Static p:Localization.TotalDuration}"></Binding>
+                    <Binding Source="{x:Static p:Resource.TotalDuration}"></Binding>
                     <Binding Path="PlaylistSource.TotalDuration" ElementName="This"></Binding>
                 </MultiBinding>
             </TextBlock.Text>

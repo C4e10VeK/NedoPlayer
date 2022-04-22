@@ -60,4 +60,7 @@
     <data name="TotalDuration" xml:space="preserve">
         <value>Total duration</value>
     </data>
+    <data name="MediaFileFilter" xml:space="preserve">
+        <value>mp3 files (*.mp3)|*.mp3|mp4 files (*.mp4)|*.mp4|mkv files (*.mkv)|*.mkv|flv files (*.flv)|*.flv|webm files (*.webm)|*.webm|All files (*.*)|*.*</value>
+    </data>
 </root>

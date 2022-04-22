@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -18,8 +19,8 @@ namespace NedoPlayer.ViewModels
 {
     public sealed class MainViewModel : BaseViewModel
     {
-        public MediaControlController ControlController { get; }
-        private readonly IOService? _fileDialogService;
+        public MediaControlController MediaControlController { get; }
+        private readonly FileService _fileDialogService;
         private int _playedMediaIndex;
 
         private string _trackTitle;
@@ -152,7 +153,7 @@ namespace NedoPlayer.ViewModels
 
         public MainViewModel(IEventAggregator aggregator) : base(aggregator)
         {
-            ControlController = new MediaControlController(this);
+            MediaControlController = new MediaControlController(this);
             _fileDialogService = new FileService();
             _trackTitle = "";
             _isPaused = true;
@@ -162,27 +163,24 @@ namespace NedoPlayer.ViewModels
             _isMuted = false;
             _isPlayListOpened = false;
             _playedMediaIndex = 0;
-            _playlist = new Playlist
-            {
-                MediaInfos = new ObservableCollection<MediaInfo>(),
-                TotalDuration = TimeSpan.FromSeconds(635 * 3)
-            };
+            _playlist = new Playlist();
+            _playedMediaIndex = -1;
 
-            CloseCommand = new RelayCommand(ControlController.Close);
-            PlayPauseCommand = new RelayCommand(ControlController.PlayPause);
+            CloseCommand = new RelayCommand(MediaControlController.Close);
+            PlayPauseCommand = new RelayCommand(_ => MediaControlController.PlayPause());
             MaximizeCommand = new RelayCommand(Maximize);
             MuteCommand = new RelayCommand(_ => IsMuted = !IsMuted);
             MediaOpenedCommand = new RelayCommand(MediaOpened);
             OpenPlaylistCommand = new RelayCommand(_ => IsPlayListOpened = !IsPlayListOpened);
-            SeekStartCommand = new RelayCommand(o =>
+            SeekStartCommand = new RelayCommand(_ =>
             {
                 if (IsPaused) return;
-                ControlController.PlayPause(o);
+                MediaControlController.PlayPause();
             });
-            SeekEndCommand = new RelayCommand(ControlController.PlayPause);
+            SeekEndCommand = new RelayCommand(_ => MediaControlController.PlayPause());
             OpenFileCommand = new RelayCommand(OpenMediaFile);
 
-            NextMediaCommand = new RelayCommand(NextMediaFile, _ => _playedMediaIndex < Playlist?.MediaInfos?.Count);
+            NextMediaCommand = new RelayCommand(NextMediaFile, _ => _playedMediaIndex < Playlist.MediaInfos.Count);
             PreviousMediaCommand = new RelayCommand(PreviousMediaFile, _ => _playedMediaIndex > 0);
         }
 
@@ -199,7 +197,7 @@ namespace NedoPlayer.ViewModels
                 wnd.UseNoneWindowStyle = true;
 
                 IsFullscreen = true;
-                ControlController.Maximize(IsFullscreen);
+                MediaControlController.Maximize(IsFullscreen);
                 return;
             }
             
@@ -208,7 +206,7 @@ namespace NedoPlayer.ViewModels
             wnd.ShowTitleBar = true;
 
             IsFullscreen = false;
-            ControlController.Maximize(IsFullscreen);
+            MediaControlController.Maximize(IsFullscreen);
         }
 
         private void NextMediaFile(object? o)
@@ -235,24 +233,37 @@ namespace NedoPlayer.ViewModels
         {
             string filePath = _fileDialogService.OpenFileDialog(this, @"C:\");
             OpenMediaFileInternal(filePath);
+            if (Playlist.MediaInfos.Count != 1 || _playedMediaIndex > -1) return;
+            var path = Playlist.MediaInfos.First().Path + Playlist.MediaInfos.First().Title;
+            MediaControlController.OpenMediaFile(path);
+            Playlist.MediaInfos.First().IsPlaying = true;
+            ++_playedMediaIndex;
         }
 
         public void OpenMediaFileInternal(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath)) return;
-            var title = Path.GetFileName(filePath);
+            string title = Path.GetFileName(filePath);
 
 
             var tempMediaList = new ObservableCollection<MediaInfo>(Playlist.MediaInfos.OrderBy(x => x));
+            Debug.Assert(Playlist != null, "Playlist != null");
             var groupList = Playlist?.MediaInfos.Where(x => x.Path == filePath.Replace(title, "")).ToList();
-            var groupId = tempMediaList?.Count == 0 ?
-                0 : groupList?.Count <= 0 ? tempMediaList?.Last().GroupId + 1 : groupList.First().GroupId;
+            var groupId = tempMediaList.Count == 0 ?
+                0 : groupList?.Count <= 0 ? tempMediaList.Last().GroupId + 1 : groupList?.First().GroupId;
 
             using var shell = ShellObject.FromParsingName(filePath);
             var prop = shell.Properties.System.Media.Duration;
             var duration = prop.Value ?? 0;
             var mediaAdd = new MediaInfo(groupId.GetValueOrDefault(), filePath.Replace(title, ""), title, TimeSpan.FromTicks((long)duration));
-            Playlist?.MediaInfos?.Add(mediaAdd);
+            Playlist?.MediaInfos.Add(mediaAdd);
+            CountPlaylistDuration();
+        }
+
+        private void CountPlaylistDuration()
+        {
+            foreach (var mediaInfo in Playlist.MediaInfos)
+                Playlist.TotalDuration += mediaInfo.Duration.GetValueOrDefault();
         }
 
         private void NotifySliderDataChanged()

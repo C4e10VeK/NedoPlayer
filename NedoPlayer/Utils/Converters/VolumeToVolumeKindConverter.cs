@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows.Data;
 using MahApps.Metro.IconPacks;
 
-namespace NedoPlayer.Utils;
+namespace NedoPlayer.Utils.Converters;
 
 public class VolumeToVolumeKindConverter : IMultiValueConverter
 {
