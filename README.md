@@ -6,7 +6,7 @@
 
 - [X] Add event aggregator
 - [X] Event aggregator implementation
-- [ ] Add playlist
+- [X] Add playlist
 - [x] Add base command for binding
 - [x] Add base menu
 - [ ] Add popup menu

@@ -1,9 +1,10 @@
-﻿using System.Windows;
-using MahApps.Metro.Controls;
+﻿using System;
+using System.Collections.Generic;
+using System.Windows;
 
 namespace NedoPlayer.Services;
 
-public class WindowStateService
+public class WindowStateService : IStateService
 {
     private struct CurrentState
     {
@@ -13,21 +14,33 @@ public class WindowStateService
         public double WndHeight { get; set; }
     }
 
-    private static CurrentState _state;
+    private readonly Dictionary<Type, CurrentState> _states;
     
-    public static void SaveCurrentWindowState(MetroWindow window)
+    public WindowStateService() => _states = new Dictionary<Type, CurrentState>();
+
+    public void SaveState(object? o)
     {
-        _state.WndState = window.WindowState;
-        _state.WndStyle = window.WindowStyle;
-        _state.WndWidth = window.Width;
-        _state.WndHeight = window.Height;
+        if (o is not Window window) 
+            return;
+        
+        _states[o.GetType()] = new CurrentState
+        {
+            WndHeight = window.Height, 
+            WndWidth = window.Width, 
+            WndState = window.WindowState,
+            WndStyle = window.WindowStyle
+        };
     }
-    
-    public static void LoadCurrentWindowState(ref MetroWindow window)
+
+    public void LoadState(object? o)
     {
-        window.WindowState = _state.WndState;
-        window.WindowStyle = _state.WndStyle;
-        window.Width = _state.WndWidth;
-        window.Height = _state.WndHeight;
+        if (o is not Window window)
+            return;
+
+        var state = _states[o.GetType()];
+        window.Height = state.WndHeight;
+        window.Width = state.WndWidth;
+        window.WindowState = state.WndState;
+        window.WindowStyle = state.WndStyle;
     }
 }

@@ -4,6 +4,7 @@
              xmlns:local="clr-namespace:NedoPlayer"
              xmlns:utils="clr-namespace:NedoPlayer.Utils"
              xmlns:converters="clr-namespace:NedoPlayer.Utils.Converters"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              StartupUri="MainWindow.xaml"
              Startup="App_OnStartup">
     <Application.Resources>
@@ -13,12 +14,17 @@
                  <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                  <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/dark.blue.xaml" />
              </ResourceDictionary.MergedDictionaries>
+             <mah:ToUpperConverter x:Key="ToUpperConverter" />
              <utils:ViewModelLocator x:Key="ViewModelLocator" />
              <converters:BoolToPlayPauseKindConverter x:Key="BoolToPlayPauseKindConverter" />
              <converters:BoolToPlayPauseImgConverter x:Key="BoolToPlayPauseImgConverter" />
              <converters:VolumeToVolumeKindConverter x:Key="VolumeToVolumeKindConverter" />
              <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
              <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+             <converters:BoolToPlayingColorConverter x:Key="BoolToPlayingColorConverter" />
+             <converters:IntToRepeatKindConverter x:Key="IntToRepeatKindConverter" />
+             <converters:ItemsToDurationConverter x:Key="TotalDurationConverter" />
+             <converters:ItemsToFolderNameConverter x:Key="ItemsToFolderNameConverter" />
          </ResourceDictionary>
     </Application.Resources>
 </Application>

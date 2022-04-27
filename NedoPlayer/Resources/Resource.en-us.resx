@@ -1,11 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-
-<root>
-    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-        <xsd:element name="root" msdata:IsDataSet="true">
-            
-        </xsd:element>
-    </xsd:schema>
+﻿<root>
     <resheader name="resmimetype">
         <value>text/microsoft-resx</value>
     </resheader>
@@ -45,11 +38,11 @@
     <data name="PlayPause" xml:space="preserve">
         <value>Play/Pause</value>
     </data>
-    <data name="Mute" xml:space="preserve">
-        <value>Mute</value>
-    </data>
     <data name="Stop" xml:space="preserve">
         <value>Stop</value>
+    </data>
+    <data name="Mute" xml:space="preserve">
+        <value>Mute</value>
     </data>
     <data name="NextMedia" xml:space="preserve">
         <value>Next</value>
@@ -60,7 +53,7 @@
     <data name="TotalDuration" xml:space="preserve">
         <value>Total duration</value>
     </data>
-    <data name="MediaFileFilter" xml:space="preserve">
-        <value>mp3 files (*.mp3)|*.mp3|mp4 files (*.mp4)|*.mp4|mkv files (*.mkv)|*.mkv|flv files (*.flv)|*.flv|webm files (*.webm)|*.webm|All files (*.*)|*.*</value>
+    <data name="Playlist" xml:space="preserve">
+        <value>Playlist</value>
     </data>
 </root>

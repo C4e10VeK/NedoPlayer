@@ -39,7 +39,7 @@ namespace NedoPlayer.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("NedoPlayer.Resources.Localization", typeof(Resource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("NedoPlayer.Resources.Resource", typeof(Resource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -106,7 +106,7 @@ namespace NedoPlayer.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to mp3 files (*.mp3)|*.mp3|mp4 files (*.mp4)|*.mp4|mkv files (*.mkv)|*.mkv|flv files (*.flv)|*.flv|webm files (*.webm)|*.webm|All files (*.*)|*.*.
+        ///   Looks up a localized string similar to mp4 files (*.mp4)|*.mp4|mkv files (*.mkv)|*.mkv|flv files (*.flv)|*.flv|webm files (*.webm)|*.webm|mp3 files (*.mp3)|*.mp3|All files (*.*)|*.*.
         /// </summary>
         public static string MediaFileFilter {
             get {
@@ -156,6 +156,15 @@ namespace NedoPlayer.Resources {
         public static string Player {
             get {
                 return ResourceManager.GetString("Player", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Playlist.
+        /// </summary>
+        public static string Playlist {
+            get {
+                return ResourceManager.GetString("Playlist", resourceCulture);
             }
         }
         

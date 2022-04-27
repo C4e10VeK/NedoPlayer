@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace NedoPlayer.Controls;
 
-public partial class VideoPlayerControl : UserControl
+public partial class VideoPlayerControl
 {
     public TimeSpan PlaybackEndTime
     {

@@ -4,22 +4,84 @@ namespace NedoPlayer.Models;
 
 public class MediaInfo : ModelBase, IComparable<MediaInfo>, IEquatable<MediaInfo>
 {
+    private int _groupId;
 
-    public int GroupId { get; set; }
-    public string Path { get; set; }
-    public string Title { get; set; }
-    public TimeSpan? Duration { get; set; }
-    public int Repeat { get; set; }
-    public bool IsPlaying { get; set; }
-        
+    public int GroupId
+    {
+        get => _groupId;
+        set
+        {
+            _groupId = value;
+            OnPropertyChanged(nameof(GroupId));
+        }
+    }
+
+    private string _path;
+    public string Path
+    {
+        get => _path;
+        set
+        {
+            _path = value ?? throw new ArgumentNullException(nameof(value));
+            OnPropertyChanged(nameof(Path));
+        }
+    }
+
+    private string _title;
+    public string Title
+    {
+        get => _title;
+        set
+        {
+            _title = value ?? throw new ArgumentNullException(nameof(value));
+            OnPropertyChanged(nameof(Title));
+        }
+    }
+
+    private TimeSpan? _duration;
+
+    public TimeSpan? Duration
+    {
+        get => _duration;
+        set
+        {
+            _duration = value;
+            OnPropertyChanged(nameof(Duration));
+        }
+    }
+
+    private int _repeat;
+
+    public int Repeat
+    {
+        get => _repeat;
+        set
+        {
+            _repeat = value;
+            OnPropertyChanged(nameof(Repeat));
+        }
+    }
+
+    private bool _isPlaying;
+
+    public bool IsPlaying
+    {
+        get => _isPlaying;
+        set
+        {
+            _isPlaying = value;
+            OnPropertyChanged(nameof(IsPlaying));
+        }
+    }
+
     public MediaInfo(int groupId, string path = "", string title = "", TimeSpan? duration = null)
     {
-        GroupId = groupId;
-        Path = path;
-        Title = title;
-        Duration = duration;
-        Repeat = 0;
-        IsPlaying = false;
+        _groupId = groupId;
+        _path = path;
+        _title = title;
+        _duration = duration;
+        _repeat = 0;
+        _isPlaying = false;
     }
 
     public int CompareTo(MediaInfo? other)

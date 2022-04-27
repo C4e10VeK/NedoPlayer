@@ -6,6 +6,7 @@ using MahApps.Metro.IconPacks;
 
 namespace NedoPlayer.Utils.Converters;
 
+[ValueConversion(typeof(bool), typeof(PackIconMaterialKind))]
 public class BoolToPlayPauseKindConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -22,6 +23,7 @@ public class BoolToPlayPauseKindConverter : IValueConverter
     }
 }
 
+[ValueConversion(typeof(bool), typeof(BitmapImage))]
 public class BoolToPlayPauseImgConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Globalization;
-using System.Windows;
 using System.Windows.Data;
+using MahApps.Metro.IconPacks;
 
 namespace NedoPlayer.Utils.Converters;
 
-[ValueConversion(typeof(bool), typeof(Visibility))]
-public class BoolToVisibilityConverter : IValueConverter
+[ValueConversion(typeof(int), typeof(PackIconModernKind))]
+public class IntToRepeatKindConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value is not bool val)
-            return Visibility.Visible;
+        if (value is not int v)
+            return PackIconModernKind.None;
 
-        return val ? Visibility.Collapsed : Visibility.Visible;
+        return v > 0 ? PackIconModernKind.Repeat : PackIconModernKind.None;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

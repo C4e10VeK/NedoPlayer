@@ -1,9 +1,8 @@
-﻿using NedoPlayer.ViewModels;
+﻿namespace NedoPlayer.Services;
 
-namespace NedoPlayer.Services
+public interface IOService
 {
-    internal interface IOService
-    {
-        public string OpenFileDialog(BaseViewModel parent, string path);
-    }
+    public string OpenFileDialog(string path);
+
+    public string OpenFolderDialog(string path);
 }

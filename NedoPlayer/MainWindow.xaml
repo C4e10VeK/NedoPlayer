@@ -27,7 +27,7 @@
     <mah:MetroWindow.RightWindowCommands>
         <mah:WindowCommands>
             <TextBlock Margin="4" VerticalAlignment="Center"
-                       Text="{Binding TrackTitle}" />
+                       Text="{Binding TrackTitle, Converter={StaticResource ToUpperConverter}}" />
         </mah:WindowCommands>
     </mah:MetroWindow.RightWindowCommands>
     <mah:MetroWindow.TaskbarItemInfo>
@@ -119,14 +119,18 @@
         <ffme:MediaElement Grid.Row="1" x:Name="VideoPlayer"
                            LoadedBehavior="Play"
                            Position="{Binding PlayerTimeToEnd}"
-                           Volume="{Binding VolumeToFmpeg, Mode=TwoWay}"
-                           IsMuted="{Binding IsMuted, Mode=TwoWay}">
-            <ffme:MediaElement.Background>
-                <ImageBrush ImageSource="./Resources/img/background.png" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
-            </ffme:MediaElement.Background>
+                           Volume="{Binding VolumeToFfmpeg, Mode=TwoWay}"
+                           IsMuted="{Binding IsMuted, Mode=TwoWay}"
+                           Background="Black">
+            <!-- <ffme:MediaElement.Background> -->
+                <!-- <ImageBrush ImageSource="./Resources/img/background.png" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" /> -->
+            <!-- </ffme:MediaElement.Background> -->
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MediaOpened">
                     <i:InvokeCommandAction Command="{Binding MediaOpenedCommand}" PassEventArgsToCommand="True" />
+                </i:EventTrigger>
+                <i:EventTrigger EventName="MediaEnded">
+                    <i:InvokeCommandAction Command="{Binding MediaEndedCommand}" />
                 </i:EventTrigger>
                 <i:EventTrigger EventName="SeekingStarted">
                     <i:InvokeCommandAction Command="{Binding SeekStartCommand}" PassEventArgsToCommand="True" />
@@ -143,7 +147,7 @@
                                      PositionSecond="{Binding PlayerTimeToEndSeconds, Mode=TwoWay}"
                                      Volume="{Binding Volume, Mode=OneWayToSource}"
                                      IsMuted="{Binding IsMuted}"
-                                     IsPaused="{Binding IsPaused}"
+                                     IsPaused="{Binding IsPaused, Mode=TwoWay}"
                                      PlayPauseCommand="{Binding PlayPauseCommand}"
                                      MaximizeCommand="{Binding MaximizeCommand}"
                                      MuteCommand="{Binding MuteCommand}"

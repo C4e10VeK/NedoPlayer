@@ -28,7 +28,7 @@ public class FormattedTimeSlider : Slider
     {
         if (string.IsNullOrWhiteSpace(AutoToolTipFormat)) return;
         if (AutoToolTip != null)
-            AutoToolTip.Content = string.Format(AutoToolTipFormat,
+            AutoToolTip.Content = string.Format(AutoToolTipFormat!,
                 TimeSpan.FromSeconds(double.Parse((string) AutoToolTip.Content)));
     }
 

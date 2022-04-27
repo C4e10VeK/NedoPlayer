@@ -81,20 +81,20 @@
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Update="Resources\Localization.en-us.resx">
+      <EmbeddedResource Update="Resources\Resource.en-us.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Localization.resx">
+      <EmbeddedResource Update="Resources\Resource.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
-        <LastGenOutput>Localization.Designer.cs</LastGenOutput>
+        <LastGenOutput>Resource.Designer.cs</LastGenOutput>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Localization.ru-ru.resx">
+      <EmbeddedResource Update="Resources\Resource.ru-ru.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
       </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="Resources\Localization.Designer.cs">
+      <Compile Update="Resources\Resource.Designer.cs">
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
         <DependentUpon>Localization.resx</DependentUpon>

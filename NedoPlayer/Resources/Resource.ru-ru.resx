@@ -53,4 +53,7 @@
     <data name="TotalDuration" xml:space="preserve">
         <value>Общая продолжительность</value>
     </data>
+    <data name="Playlist" xml:space="preserve">
+        <value>Плейлист</value>
+    </data>
 </root>

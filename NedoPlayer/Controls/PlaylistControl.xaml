@@ -40,7 +40,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <Style x:Key="MyCoolExpanderStyle" TargetType="{x:Type Expander}">
+        <Style x:Key="PlaylistExpanderStyle" TargetType="{x:Type Expander}">
             <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}" />
             <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.AccentBase}" />
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -116,21 +116,19 @@
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="GroupItem">
-                                        <Expander IsExpanded="True" BorderBrush="#FFA4B97F"
-                                                  BorderThickness="0,0,0,0"
-                                                  Style="{StaticResource MyCoolExpanderStyle}">
+                                        <Expander IsExpanded="True"
+                                                  HorizontalAlignment="Stretch"
+                                                  Style="{StaticResource PlaylistExpanderStyle}">
                                             <Expander.Header>
-                                                
-                                                <DockPanel>
-                                                    <TextBlock FontWeight="Bold" Text="{Binding Name}"
+                                                <DockPanel LastChildFill="False" HorizontalAlignment="Stretch">
+                                                    <TextBlock DockPanel.Dock="Left" 
+                                                               FontWeight="Bold" 
+                                                               Text="{Binding Items, Converter={StaticResource ItemsToFolderNameConverter}}"
                                                                Margin="5,0,0,0" />
-                                                    <!-- <TextBlock FontWeight="Thin" -->
-                                                               <!-- Text="{Binding Items, Converter={StaticResource DurationConverter}}" -->
-                                                               <!-- Margin="5,0,0,0" /> -->
                                                 </DockPanel>
                                             </Expander.Header>
                                             <Expander.Content>
-                                                <ItemsPresenter></ItemsPresenter>
+                                                <ItemsPresenter />
                                             </Expander.Content>
                                         </Expander>
                                     </ControlTemplate>
@@ -167,8 +165,10 @@
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <DockPanel LastChildFill="False" HorizontalAlignment="Stretch">
-                        <TextBlock DockPanel.Dock="Left" Text="{Binding Title}"></TextBlock>
-                        <TextBlock DockPanel.Dock="Right" Text="{Binding Duration, StringFormat={}{0:hh\\:mm\\:ss}}"></TextBlock>
+                        <TextBlock DockPanel.Dock="Left" Text="{Binding Title}"
+                                   Foreground="{Binding IsPlaying, Converter={StaticResource BoolToPlayingColorConverter}}"/>
+                        <iconPacks:PackIconModern Kind="{Binding Repeat, Converter={StaticResource IntToRepeatKindConverter}}"/>
+                        <TextBlock DockPanel.Dock="Right" Text="{Binding Duration, StringFormat={}{0:hh\\:mm\\:ss}}" />
                     </DockPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
