@@ -36,21 +36,21 @@ public sealed class MainViewModel : BaseViewModel
         }
     }
 
-    private TimeSpan _playerTimeToEnd;
-    public TimeSpan PlayerTimeToEnd
+    private TimeSpan _position;
+    public TimeSpan Position
     {
-        get => _playerTimeToEnd;
+        get => _position;
         set
         {
-            _playerTimeToEnd = value;
+            _position = value;
             NotifySliderDataChanged();
         }
     }
 
-    public double PlayerTimeToEndSeconds
+    public double PositionSeconds
     {
-        get => PlayerTimeToEnd.TotalSeconds;
-        set => PlayerTimeToEnd = TimeSpan.FromSeconds(value);
+        get => Position.TotalSeconds;
+        set => Position = TimeSpan.FromSeconds(value);
     }
 
     private TimeSpan _totalDuration;
@@ -142,20 +142,47 @@ public sealed class MainViewModel : BaseViewModel
         }
     }
 
+    private int _selectedMediaIndex;
+    public int SelectedMediaIndex
+    {
+        get => _selectedMediaIndex;
+        set
+        {
+            _selectedMediaIndex = value;
+            OnPropertyChanged(nameof(SelectedMediaIndex));
+        }
+    }
+
+    private MediaInfo _currentMedia;
+
+    public MediaInfo CurrentMedia
+    {
+        get => _currentMedia;
+        set
+        {
+            _currentMedia = value ?? throw new ArgumentNullException(nameof(value));
+            OnPropertyChanged(nameof(CurrentMedia));
+        }
+    }
+
     public ICommand CloseCommand { get; }
     public ICommand PlayPauseCommand { get; }
     public ICommand MaximizeCommand { get; }
     public ICommand MuteCommand { get; }
     public ICommand MediaOpenedCommand { get; }
     public ICommand OpenPlaylistCommand { get; }
-    public ICommand SeekStartCommand { get; }
-    public ICommand SeekEndCommand { get; }
     public ICommand MediaEndedCommand { get; }
 
-    public ICommand OpenFileCommand { get; }
     public ICommand NextMediaCommand { get; }
     public ICommand PreviousMediaCommand { get; }
-
+    public ICommand OpenFileCommand { get; }
+    public ICommand OpenFolderCommand { get; }
+    public ICommand AddFileToPlaylistCommand { get; }
+    public ICommand AddFolderToPlaylistCommand { get; }
+    public ICommand DeleteMediaFromPlaylistCommand { get; }
+    public ICommand RepeatMediaCommand { get; }
+    public ICommand RepeatCurrentMediaCommand { get; }
+    
     public MainViewModel(IEventAggregator aggregator, IOService fileService, IStateService windowStateService) : base(aggregator)
     {
         MediaControlController = new MediaControlController(this);
@@ -163,7 +190,7 @@ public sealed class MainViewModel : BaseViewModel
         _windowStateService = windowStateService;
         _trackTitle = "";
         _isPaused = true;
-        _playerTimeToEnd = TimeSpan.FromSeconds(0);
+        _position = TimeSpan.FromSeconds(0);
         _totalDuration = TimeSpan.Zero;
         _volume = 100;
         _volumeToFfmpeg = _volume / 100;
@@ -172,40 +199,94 @@ public sealed class MainViewModel : BaseViewModel
         _playedMediaIndex = 0;
         _playlist = new Playlist();
         _playedMediaIndex = -1;
+        _selectedMediaIndex = -1;
+        _currentMedia = new MediaInfo(-1);
 
         CloseCommand = new RelayCommand(_ => MediaControlController.Close());
-        PlayPauseCommand = new RelayCommand(_ =>
-        {
-            if (IsPaused)
-            {
-                MediaControlController.Play();
-                IsPaused = false;
-                return;
-            }
-            MediaControlController.Pause();
-            IsPaused = true;
-        });
-        MaximizeCommand = new RelayCommand(Maximize);
+        PlayPauseCommand = new RelayCommand( _ => PlayPauseSwitch(), _ => Playlist.MediaInfos.Any());
+        MaximizeCommand = new RelayCommand(_ => Maximize());
         MuteCommand = new RelayCommand(_ => IsMuted = !IsMuted);
         MediaOpenedCommand = new RelayCommand(MediaOpened);
         OpenPlaylistCommand = new RelayCommand(_ => IsPlayListOpened = !IsPlayListOpened);
-        SeekStartCommand = new RelayCommand(_ =>
-        {
-            MediaControlController.Pause();
-        });
-        SeekEndCommand = new RelayCommand(_ => MediaControlController.Play());
         MediaEndedCommand = new RelayCommand(MediaEnded);
-            
-        OpenFileCommand = new RelayCommand(OpenMediaFile);
-        NextMediaCommand = new RelayCommand(NextMediaFile, _ => _playedMediaIndex < Playlist.MediaInfos.Count - 1);
-        PreviousMediaCommand = new RelayCommand(PreviousMediaFile, _ => _playedMediaIndex > 0);
+
+        NextMediaCommand =
+            new RelayCommand(_ => NextMediaFile(), _ => _playedMediaIndex < Playlist.MediaInfos.Count - 1);
+        PreviousMediaCommand = new RelayCommand(_ => PreviousMediaFile(), _ => _playedMediaIndex > 0);
+
+        OpenFileCommand = new RelayCommand(_ => OpenFile());
+        OpenFolderCommand = new RelayCommand(_ => OpenFolder());
+        AddFileToPlaylistCommand = new RelayCommand(_ => AddFileToPlaylist());
+        AddFolderToPlaylistCommand = new RelayCommand(_ => AddFolderToPlaylist());
+
+        DeleteMediaFromPlaylistCommand = new RelayCommand(_ => DeleteMediaFile(), _ => Playlist.MediaInfos.Any());
+        RepeatMediaCommand = new RelayCommand(
+                _ => Playlist.MediaInfos[SelectedMediaIndex].Repeat = !Playlist.MediaInfos[SelectedMediaIndex].Repeat,
+                _ => Playlist.MediaInfos.Any()
+                );
+        RepeatCurrentMediaCommand = new RelayCommand(_ => CurrentMedia.Repeat = !CurrentMedia.Repeat,
+            _ => Playlist.MediaInfos.Any());
+    }
+
+    private void PlayPauseSwitch()
+    {
+        if (IsPaused)
+        {
+            MediaControlController.Play();
+            IsPaused = false;
+            return;
+        }
+
+        MediaControlController.Pause();
+        IsPaused = true;
+    }
+
+    /// <summary>
+    /// Open media file from folder
+    /// </summary>
+    private void OpenFile()
+    {
+        string filePath = _fileDialogService.OpenFileDialog(@"C:\");
+        if (string.IsNullOrWhiteSpace(filePath)) return;
+
+        if (Playlist.MediaInfos.Any())
+        {
+            Playlist.MediaInfos.Clear();
+            _playedMediaIndex = -1;
+        }
+        
+        OpenMediaFileInternal(filePath);
+
+        NextMediaFile();
+        IsPaused = false;
+    }
+
+    private void OpenFolder()
+    {
+        string folder = _fileDialogService.OpenFolderDialog(@"C:\");
+        if (string.IsNullOrWhiteSpace(folder)) return;
+
+        if (Playlist.MediaInfos.Any())
+        {
+            Playlist.MediaInfos.Clear();
+            _playedMediaIndex = -1;
+        }
+        
+        var allowedExt = new[] {"mp3", "mp4", "webm", "mkv", "flv", "avi", "amv"};
+        
+        foreach (var f in Directory.GetFiles(folder).Where(f => allowedExt.Any(f.ToLower().EndsWith)))
+        {
+            OpenMediaFileInternal(f);
+        }
+        
+        NextMediaFile();
+        IsPaused = false;
     }
 
     /// <summary>
     /// Maximize main window
     /// </summary>
-    /// <param name="s"></param>
-    private void Maximize(object? s)
+    private void Maximize()
     {
         if (Application.Current.MainWindow is not MetroWindow wnd) return;
 
@@ -235,10 +316,12 @@ public sealed class MainViewModel : BaseViewModel
     /// <summary>
     /// Set next media file in container
     /// </summary>
-    /// <param name="o"></param>
-    private void NextMediaFile(object? o)
+    private void NextMediaFile()
     {
-        Playlist.MediaInfos[_playedMediaIndex].IsPlaying = false;
+        if (_playedMediaIndex == Playlist.MediaInfos.Count - 1) return;
+        if (_playedMediaIndex > -1)
+            Playlist.MediaInfos[_playedMediaIndex].IsPlaying = false;
+        
         ++_playedMediaIndex;
 
         Playlist.MediaInfos[_playedMediaIndex].IsPlaying = true;
@@ -249,9 +332,11 @@ public sealed class MainViewModel : BaseViewModel
     /// <summary>
     /// set previous media file in container
     /// </summary>
-    /// <param name="o"></param>
-    private void PreviousMediaFile(object? o)
+    private void PreviousMediaFile()
     {
+        if (_playedMediaIndex is < 0 or 0)
+            return;
+            
         Playlist.MediaInfos[_playedMediaIndex].IsPlaying = false;
         --_playedMediaIndex;
 
@@ -270,8 +355,9 @@ public sealed class MainViewModel : BaseViewModel
             return;
             
         TotalDuration = args.Info.Duration;
-        PlayerTimeToEnd = args.Info.StartTime;
+        Position = args.Info.StartTime;
         TrackTitle = $"{args.Info.MediaSource}";
+        CurrentMedia = Playlist.MediaInfos[_playedMediaIndex];
         if (!IsPaused) 
             MediaControlController.Play();
     }
@@ -279,12 +365,12 @@ public sealed class MainViewModel : BaseViewModel
     /// <summary>
     /// Call with media opened event. Using for set next media from playlist if exist
     /// </summary>
-    /// <param name="obj"></param>
-    private void MediaEnded(object? obj)
+    /// <param name="o"></param>
+    private void MediaEnded(object? o)
     {
-        if (!Playlist.MediaInfos.Any() || _playedMediaIndex == Playlist.MediaInfos.Count - 1)
+        if (!Playlist.MediaInfos.Any() || _playedMediaIndex == Playlist.MediaInfos.Count - 1 || CurrentMedia.Repeat)
             return;
-            
+
         Playlist.MediaInfos[_playedMediaIndex].IsPlaying = false;
         ++_playedMediaIndex;
         Playlist.MediaInfos[_playedMediaIndex].IsPlaying = true;
@@ -295,14 +381,35 @@ public sealed class MainViewModel : BaseViewModel
     /// <summary>
     /// Method for open media file. Using in button command
     /// </summary>
-    /// <param name="o"></param>
-    private void OpenMediaFile(object? o)
+    private void AddFileToPlaylist()
     {
         string filePath = _fileDialogService.OpenFileDialog(@"C:\");
         if (string.IsNullOrWhiteSpace(filePath)) return;
         
         OpenMediaFileInternal(filePath);
         RunMediaIfFirst();
+    }
+    
+    private void AddFolderToPlaylist()
+    {
+        string folder = _fileDialogService.OpenFolderDialog(@"C:\");
+        if (string.IsNullOrWhiteSpace(folder)) return;
+        
+        var allowedExt = new[] {"mp3", "mp4", "webm", "mkv", "flv", "avi", "amv"};
+        
+        foreach (var f in Directory.GetFiles(folder).Where(f => allowedExt.Any(f.ToLower().EndsWith)))
+        {
+            OpenMediaFileInternal(f);
+            RunMediaIfFirst();
+        }
+    }
+    
+    private void DeleteMediaFile()
+    {
+        if (_playedMediaIndex == SelectedMediaIndex) return;
+        Playlist.MediaInfos.RemoveAt(SelectedMediaIndex);
+        var temp = Playlist.MediaInfos.AsEnumerable();
+        Playlist.MediaInfos = new(temp);
     }
 
     /// <summary>
@@ -337,7 +444,9 @@ public sealed class MainViewModel : BaseViewModel
             return;
 
         Playlist.MediaInfos.Insert(lastIndexGroup, mediaAdd);
-            
+        var temp = Playlist.MediaInfos.AsEnumerable();
+        Playlist.MediaInfos = new(temp);
+
         CountPlaylistDuration();
     }
 
@@ -349,12 +458,7 @@ public sealed class MainViewModel : BaseViewModel
         if (Playlist.MediaInfos.Count > 1 || _playedMediaIndex > -1)
             return;
             
-        string path = Playlist.MediaInfos.First().Path + Playlist.MediaInfos.First().Title;
-        MediaControlController.OpenMediaFile(path);
-        Playlist.MediaInfos.First().IsPlaying = true;
-        MediaControlController.Play();
-        IsPaused = false;
-        ++_playedMediaIndex;
+        NextMediaFile();
     }
     
     /// <summary>
@@ -368,7 +472,7 @@ public sealed class MainViewModel : BaseViewModel
 
     private void NotifySliderDataChanged()
     {
-        OnPropertyChanged(nameof(PlayerTimeToEnd));
-        OnPropertyChanged(nameof(PlayerTimeToEndSeconds));
+        OnPropertyChanged(nameof(Position));
+        OnPropertyChanged(nameof(PositionSeconds));
     }
 }

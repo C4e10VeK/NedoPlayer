@@ -9,20 +9,20 @@ public class VolumeToVolumeKindConverter : IMultiValueConverter
 {
     public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
     {
-        if (values.Length < 2) return PackIconModernKind.SoundMute;
+        if (values.Length < 2) return PackIconMaterialKind.VolumeMute;
         if (values[0] is not double vol || values[1] is not bool muted)
-            return PackIconModernKind.SoundMute;
+            return PackIconMaterialKind.VolumeMute;
 
         if (muted)
-            return PackIconModernKind.SoundMute;
+            return PackIconMaterialKind.VolumeMute;
         
         return vol switch
         {
-            > 75 => PackIconModernKind.Sound3,
-            <= 75 and > 50 => PackIconModernKind.Sound2,
-            <= 50 and > 25 => PackIconModernKind.Sound1,
-            <= 25 and > 0 => PackIconModernKind.Sound0,
-            _ => PackIconModernKind.Sound0
+            > 75 => PackIconMaterialKind.VolumeHigh,
+            <= 75 and > 50 => PackIconMaterialKind.VolumeMedium,
+            <= 50 and > 25 => PackIconMaterialKind.VolumeMedium,
+            <= 25 and > 0 => PackIconMaterialKind.VolumeLow,
+            _ => PackIconMaterialKind.VolumeLow
         };
     }
 

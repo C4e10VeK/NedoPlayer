@@ -66,4 +66,10 @@
     <data name="Playlist" xml:space="preserve">
         <value>Playlist</value>
     </data>
+    <data name="AddFile" xml:space="preserve">
+        <value>Add file to playlist</value>
+    </data>
+    <data name="AddFolder" xml:space="preserve">
+        <value>Add folder to playlist</value>
+    </data>
 </root>

@@ -56,4 +56,10 @@
     <data name="Playlist" xml:space="preserve">
         <value>Плейлист</value>
     </data>
+    <data name="AddFile" xml:space="preserve">
+        <value>Добавить файл в плейлист</value>
+    </data>
+    <data name="AddFolder" xml:space="preserve">
+        <value>Добавить папку в плейлист</value>
+    </data>
 </root>

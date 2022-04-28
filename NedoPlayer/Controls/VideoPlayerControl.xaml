@@ -145,7 +145,7 @@
                 <Button Width="35" Height="35" Margin="5 0" ToolTip="{x:Static p:Resource.PrevMedia}"
                         Style="{DynamicResource MahApps.Styles.Button.Circle}"
                         Command="{Binding PrevMediaCommand, ElementName=This}">
-                    <iconPacks:PackIconModern Width="20" Height="20" Margin="0 0 0 1" Kind="ControlRewindVariant" />
+                    <iconPacks:PackIconMaterial Width="20" Height="20" Margin="0 0 0 1" Kind="Rewind" />
                 </Button>
                 <Button Width="35" Height="35" Margin="5 0" ToolTip="{x:Static p:Resource.PlayPause}"
                         HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
@@ -164,7 +164,7 @@
                 <Button Width="35" Height="35" Margin="5 0" ToolTip="{x:Static p:Resource.NextMedia}"
                         Style="{DynamicResource MahApps.Styles.Button.Circle}"
                         Command="{Binding NextMediaCommand, ElementName=This}">
-                    <iconPacks:PackIconModern Width="20" Height="20" Margin="0 0 0 1" Kind="ControlFastforwardVariant" />
+                    <iconPacks:PackIconMaterial Width="20" Height="20" Margin="0 0 0 1" Kind="FastForward" />
                 </Button>
             </StackPanel>
             <StackPanel Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2"
@@ -178,14 +178,14 @@
                             VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
                             Style="{DynamicResource MahApps.Styles.Button.Split}"
                             Command="{Binding MuteCommand, ElementName=This}">
-                        <iconPacks:PackIconModern Width="20" Height="20">
-                            <iconPacks:PackIconModern.Kind>
+                        <iconPacks:PackIconMaterial Width="20" Height="20">
+                            <iconPacks:PackIconMaterial.Kind>
                                 <MultiBinding Converter="{StaticResource VolumeToVolumeKindConverter}">
                                     <Binding Path="Volume" ElementName="This" />
                                     <Binding Path="IsMuted" ElementName="This" />
                                 </MultiBinding>
-                            </iconPacks:PackIconModern.Kind>
-                        </iconPacks:PackIconModern>
+                            </iconPacks:PackIconMaterial.Kind>
+                        </iconPacks:PackIconMaterial>
                     </Button>
                     <Slider Grid.Column="1" Width="50" Height="10"
                             Minimum="0" Maximum="100"
@@ -199,13 +199,19 @@
                 <Button VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Playlist"
                         Width="35" Height="35" Margin="5 0"
                         Style="{DynamicResource MahApps.Styles.Button.Circle}"
+                        Command="{Binding RepeatCommand, ElementName=This}">
+                    <iconPacks:PackIconMaterial Kind="{Binding IsRepeated, ElementName=This, Converter={StaticResource BoolToRepeatIconConverter}}" />
+                </Button>
+                <Button VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Playlist"
+                        Width="35" Height="35" Margin="5 0"
+                        Style="{DynamicResource MahApps.Styles.Button.Circle}"
                         Command="{Binding OpenPlaylistCommand, ElementName=This}">
-                    <iconPacks:PackIconModern Kind="List" />
+                    <iconPacks:PackIconMaterial Kind="PlaylistMusic" />
                 </Button>
                 <Button Width="35" Height="35" Margin="5 0" ToolTip="Maximize"
                         Style="{DynamicResource MahApps.Styles.Button.Circle}"
                         Command="{Binding MaximizeCommand, ElementName=This}">
-                    <iconPacks:PackIconModern Kind="WindowMaximize" />
+                    <iconPacks:PackIconMaterial Kind="WindowMaximize" />
                 </Button>
             </StackPanel>
         </Grid>

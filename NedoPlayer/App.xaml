@@ -5,7 +5,7 @@
              xmlns:utils="clr-namespace:NedoPlayer.Utils"
              xmlns:converters="clr-namespace:NedoPlayer.Utils.Converters"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-             StartupUri="MainWindow.xaml"
+             StartupUri="Views/MainWindow.xaml"
              Startup="App_OnStartup">
     <Application.Resources>
          <ResourceDictionary>
@@ -22,9 +22,11 @@
              <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
              <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
              <converters:BoolToPlayingColorConverter x:Key="BoolToPlayingColorConverter" />
-             <converters:IntToRepeatKindConverter x:Key="IntToRepeatKindConverter" />
+             <converters:BoolToRepeatKindConverter x:Key="IntToRepeatKindConverter" />
              <converters:ItemsToDurationConverter x:Key="TotalDurationConverter" />
              <converters:ItemsToFolderNameConverter x:Key="ItemsToFolderNameConverter" />
+             <converters:BoolToLoopBehaviorConverter x:Key="BoolToLoopBehaviorConverter" />
+             <converters:BoolToRepeatIconConverter x:Key="BoolToRepeatIconConverter" />
          </ResourceDictionary>
     </Application.Resources>
 </Application>

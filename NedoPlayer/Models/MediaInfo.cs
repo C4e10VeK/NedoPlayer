@@ -50,9 +50,9 @@ public class MediaInfo : ModelBase, IComparable<MediaInfo>, IEquatable<MediaInfo
         }
     }
 
-    private int _repeat;
+    private bool _repeat;
 
-    public int Repeat
+    public bool Repeat
     {
         get => _repeat;
         set
@@ -80,7 +80,7 @@ public class MediaInfo : ModelBase, IComparable<MediaInfo>, IEquatable<MediaInfo
         _path = path;
         _title = title;
         _duration = duration;
-        _repeat = 0;
+        _repeat = false;
         _isPlaying = false;
     }
 

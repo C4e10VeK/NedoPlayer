@@ -1,5 +1,5 @@
 ﻿<UserControl x:Class="NedoPlayer.Controls.PlaylistControl"
-             x:Name="This"
+             x:Name="ThisPlaylistControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -10,7 +10,7 @@
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="300">
     <UserControl.Resources>
-        <CollectionViewSource x:Key="Playlist" Source="{Binding PlaylistSource.MediaInfos, ElementName=This}">
+        <CollectionViewSource x:Key="Playlist" Source="{Binding PlaylistSource.MediaInfos, ElementName=ThisPlaylistControl}">
             <CollectionViewSource.GroupDescriptions>
                 <PropertyGroupDescription PropertyName="GroupId"></PropertyGroupDescription>
             </CollectionViewSource.GroupDescriptions>
@@ -95,6 +95,31 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        
+        <ContextMenu x:Key="PlaylistMenu">
+            <MenuItem Header="Up">
+                <MenuItem.Icon>
+                    <iconPacks:PackIconMaterial Kind="ArrowUp"></iconPacks:PackIconMaterial>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem Header="Down">
+                <MenuItem.Icon>
+                    <iconPacks:PackIconMaterial Kind="ArrowDown"></iconPacks:PackIconMaterial>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem Header="Repeat"
+                      Command="{Binding RepeatMediaCommand, Source={x:Reference ThisPlaylistControl}}">
+                <MenuItem.Icon>
+                    <iconPacks:PackIconMaterial Kind="Repeat"></iconPacks:PackIconMaterial>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem Header="Delete"
+                      Command="{Binding DeleteMediaCommand, Source={x:Reference ThisPlaylistControl}}">
+                <MenuItem.Icon>
+                    <iconPacks:PackIconMaterial Kind="Delete"></iconPacks:PackIconMaterial>
+                </MenuItem.Icon>
+            </MenuItem>
+        </ContextMenu>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -103,9 +128,10 @@
         </Grid.RowDefinitions>
         <ListView Style="{StaticResource MahApps.Styles.ListView}"
                   Background="{DynamicResource MahApps.Brushes.Flyout.Background}"
+                  ContextMenu="{StaticResource PlaylistMenu}"
                   ItemsSource="{Binding Source={StaticResource Playlist}}"
-                  SelectedIndex="{Binding SelectedMediaIndex, ElementName=This}"
-                  SelectedItem="{Binding SelectedMedia, ElementName=This}"
+                  SelectedIndex="{Binding SelectedMediaIndex, ElementName=ThisPlaylistControl}"
+                  SelectedItem="{Binding SelectedMedia, ElementName=ThisPlaylistControl}"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                   SizeChanged="FrameworkElement_OnSizeChanged" SelectionMode="Single">
             <ListView.GroupStyle>
@@ -125,6 +151,10 @@
                                                                FontWeight="Bold" 
                                                                Text="{Binding Items, Converter={StaticResource ItemsToFolderNameConverter}}"
                                                                Margin="5,0,0,0" />
+                                                    <TextBlock DockPanel.Dock="Right"
+                                                               FontWeight="Light"
+                                                               Text="{Binding Items, Converter={StaticResource TotalDurationConverter}}"
+                                                               Margin="5,0,0,0" />
                                                 </DockPanel>
                                             </Expander.Header>
                                             <Expander.Content>
@@ -138,36 +168,12 @@
                     </GroupStyle.ContainerStyle>
                 </GroupStyle>
             </ListView.GroupStyle>
-            <ListView.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="Up">
-                        <MenuItem.Icon>
-                            <iconPacks:PackIconModern Kind="ArrowUp"></iconPacks:PackIconModern>
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <MenuItem Header="Down">
-                        <MenuItem.Icon>
-                            <iconPacks:PackIconModern Kind="ArrowDown"></iconPacks:PackIconModern>
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <MenuItem Header="Repeat">
-                        <MenuItem.Icon>
-                            <iconPacks:PackIconModern Kind="Repeat"></iconPacks:PackIconModern>
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <MenuItem Header="Delete">
-                        <MenuItem.Icon>
-                            <iconPacks:PackIconModern Kind="Delete"></iconPacks:PackIconModern>
-                        </MenuItem.Icon>
-                    </MenuItem>
-                </ContextMenu>
-            </ListView.ContextMenu>
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <DockPanel LastChildFill="False" HorizontalAlignment="Stretch">
                         <TextBlock DockPanel.Dock="Left" Text="{Binding Title}"
                                    Foreground="{Binding IsPlaying, Converter={StaticResource BoolToPlayingColorConverter}}"/>
-                        <iconPacks:PackIconModern Kind="{Binding Repeat, Converter={StaticResource IntToRepeatKindConverter}}"/>
+                        <iconPacks:PackIconMaterial Margin="5 0 0 0" Kind="{Binding Repeat, Converter={StaticResource IntToRepeatKindConverter}}"/>
                         <TextBlock DockPanel.Dock="Right" Text="{Binding Duration, StringFormat={}{0:hh\\:mm\\:ss}}" />
                     </DockPanel>
                 </DataTemplate>
@@ -179,7 +185,7 @@
             <TextBlock.Text>
                 <MultiBinding StringFormat="{}{0}: {1:hh\:mm\:ss}">
                     <Binding Source="{x:Static p:Resource.TotalDuration}"></Binding>
-                    <Binding Path="PlaylistSource.TotalDuration" ElementName="This"></Binding>
+                    <Binding Path="PlaylistSource.TotalDuration" ElementName="ThisPlaylistControl"></Binding>
                 </MultiBinding>
             </TextBlock.Text>
         </TextBlock>

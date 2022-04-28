@@ -15,7 +15,9 @@ public class BoolToPlayingColorConverter : IValueConverter
         if (value is not bool v)
             return (Brush)ThemeManager.Current.DetectTheme(Application.Current)!.Resources["MahApps.Brushes.IdealForeground"];
 
-        return v ? Brushes.Chartreuse : (Brush)ThemeManager.Current.DetectTheme(Application.Current)!.Resources["MahApps.Brushes.IdealForeground"];
+        return v
+            ? (Brush)ThemeManager.Current.DetectTheme(Application.Current)!.Resources["MahApps.Brushes.AccentBase"]
+            : (Brush)ThemeManager.Current.DetectTheme(Application.Current)!.Resources["MahApps.Brushes.IdealForeground"];
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

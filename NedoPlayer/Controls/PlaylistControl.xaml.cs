@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using NedoPlayer.Models;
 
 namespace NedoPlayer.Controls;
@@ -35,7 +36,27 @@ public partial class PlaylistControl
     public static readonly DependencyProperty SelectedMediaIndexProperty =
         DependencyProperty.Register("SelectedMediaIndex", typeof(int), typeof(PlaylistControl),
             new PropertyMetadata(-1));
+
+    public ICommand RepeatMediaCommand
+    {
+        get => (ICommand) GetValue(RepeatMediaCommandProperty);
+        set => SetValue(RepeatMediaCommandProperty, value);
+    }
+
+    public static readonly DependencyProperty RepeatMediaCommandProperty =
+        DependencyProperty.Register(nameof(RepeatMediaCommand), typeof(ICommand), typeof(PlaylistControl),
+            new UIPropertyMetadata(null));
     
+    public ICommand DeleteMediaCommand
+    {
+        get => (ICommand) GetValue(DeleteMediaCommandProperty);
+        set => SetValue(DeleteMediaCommandProperty, value);
+    }
+
+    public static readonly DependencyProperty DeleteMediaCommandProperty =
+        DependencyProperty.Register(nameof(DeleteMediaCommand), typeof(ICommand), typeof(PlaylistControl),
+            new UIPropertyMetadata(null));
+
     public PlaylistControl()
     {
         InitializeComponent();

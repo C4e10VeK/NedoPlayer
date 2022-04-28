@@ -4,7 +4,7 @@
         <OutputType>WinExe</OutputType>
         <Nullable>enable</Nullable>
         <UseWPF>true</UseWPF>
-        <ApplicationIcon>Resources\img\xws0HqMaSsI.ico</ApplicationIcon>
+        <ApplicationIcon>Resources\img\favicon.ico</ApplicationIcon>
         <LangVersion>10</LangVersion>
         <AssemblyVersion>0.5.0</AssemblyVersion>
         <NeutralLanguage>en-US</NeutralLanguage>
@@ -73,7 +73,10 @@
       <None Remove="Resources\background.png" />
       <None Remove="Resources\play-buttton.png" />
       <None Remove="Resources\pause.png" />
-      <Resource Include="Resources\img\xws0HqMaSsI.ico" />
+      <None Remove="Resources\img\favicon.ico" />
+      <Resource Include="Resources\img\favicon.ico">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
     </ItemGroup>
 
     <ItemGroup>
