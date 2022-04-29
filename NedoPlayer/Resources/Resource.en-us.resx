@@ -42,7 +42,7 @@
         <value>Stop</value>
     </data>
     <data name="Mute" xml:space="preserve">
-        <value>Mute</value>
+        <value>Mute/Unmute</value>
     </data>
     <data name="NextMedia" xml:space="preserve">
         <value>Next</value>
@@ -61,5 +61,35 @@
     </data>
     <data name="AddFolder" xml:space="preserve">
         <value>Add folder to playlist</value>
+    </data>
+    <data name="OSVersion" xml:space="preserve">
+        <value>OS Version</value>
+    </data>
+    <data name="AppVersion" xml:space="preserve">
+        <value>App version</value>
+    </data>
+    <data name="Architecture" xml:space="preserve">
+        <value>Architecture</value>
+    </data>
+    <data name="Creator" xml:space="preserve">
+        <value>Creator</value>
+    </data>
+    <data name="Repeat" xml:space="preserve">
+        <value>Repeat on/off</value>
+    </data>
+    <data name="VolumeMinus" xml:space="preserve">
+        <value>Volume -</value>
+    </data>
+    <data name="VolumePlus" xml:space="preserve">
+        <value>Volume +</value>
+    </data>
+    <data name="Delete" xml:space="preserve">
+        <value>Delete</value>
+    </data>
+    <data name="MediaDown" xml:space="preserve">
+        <value>Down</value>
+    </data>
+    <data name="MediaUp" xml:space="preserve">
+        <value>Up</value>
     </data>
 </root>

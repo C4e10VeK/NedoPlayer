@@ -6,8 +6,8 @@
         <UseWPF>true</UseWPF>
         <ApplicationIcon>Resources\img\favicon.ico</ApplicationIcon>
         <LangVersion>10</LangVersion>
-        <AssemblyVersion>0.8.9</AssemblyVersion>
-        <Version>0.8.9</Version>
+        <AssemblyVersion>0.9.5</AssemblyVersion>
+        <Version>0.9.5</Version>
         <NeutralLanguage>en-US</NeutralLanguage>
         <PlatformTarget>x64</PlatformTarget>
         <TargetFramework>net48</TargetFramework>
@@ -24,45 +24,28 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="FFME.Windows" Version="4.4.350" />
       <PackageReference Include="MahApps.Metro" Version="2.4.9" />
       <PackageReference Include="MahApps.Metro.IconPacks" Version="4.11.0" />
       <PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <AdditionalFiles Include="lib\swscale-5.dll">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </AdditionalFiles>
+      <None Include="lib\swscale-5.dll" />
       <None Remove="Resources\avcodec-58.dll" />
-      <AdditionalFiles Include="lib\avcodec-58.dll">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </AdditionalFiles>
-      <AdditionalFiles Include="lib\avdevice-58.dll">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </AdditionalFiles>
-      <AdditionalFiles Include="lib\avfilter-7.dll">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </AdditionalFiles>
-      <AdditionalFiles Include="lib\avformat-58.dll">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </AdditionalFiles>
-      <AdditionalFiles Include="lib\avutil-56.dll">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </AdditionalFiles>
+      <None Include="lib\avcodec-58.dll" />
+      <None Include="lib\avdevice-58.dll" />
+      <None Include="lib\avfilter-7.dll" />
+      <None Include="lib\avformat-58.dll" />
+      <None Include="lib\avutil-56.dll" />
       <None Remove="Resources\avdevice-58.dll" />
       <None Remove="Resources\avfilter-7.dll" />
       <None Remove="Resources\avformat-58.dll" />
       <None Remove="Resources\avutil-56.dll" />
       <None Remove="Resources\postproc-55.dll" />
       <None Remove="Resources\swresample-3.dll" />
-      <AdditionalFiles Include="lib\postproc-55.dll">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </AdditionalFiles>
+      <None Include="lib\postproc-55.dll" />
       <None Remove="Resources\swscale-5.dll" />
-      <AdditionalFiles Include="lib\swresample-3.dll">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </AdditionalFiles>
+      <None Include="lib\swresample-3.dll" />
     </ItemGroup>
 
     <ItemGroup>
@@ -76,6 +59,8 @@
       <Resource Include="Resources\img\favicon.ico">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Resource>
+      <None Remove="Resources\img\logo.png" />
+      <Resource Include="Resources\img\logo.png" />
     </ItemGroup>
 
     <ItemGroup>
@@ -101,6 +86,13 @@
         <AutoGen>True</AutoGen>
         <DependentUpon>Localization.resx</DependentUpon>
       </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="ffme.win">
+        <HintPath>..\..\..\.nuget\packages\ffme.windows\4.2.330\lib\net472\ffme.win.dll</HintPath>
+      </Reference>
+      <Reference Include="System.Windows.Forms" />
     </ItemGroup>
 
 </Project>

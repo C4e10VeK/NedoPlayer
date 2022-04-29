@@ -42,7 +42,7 @@
         <value>Стоп</value>
     </data>
     <data name="Mute" xml:space="preserve">
-        <value>Выключить звук</value>
+        <value>Вкл/Выкл звук</value>
     </data>
     <data name="NextMedia" xml:space="preserve">
         <value>Следующий</value>
@@ -61,5 +61,35 @@
     </data>
     <data name="AddFolder" xml:space="preserve">
         <value>Добавить папку в плейлист</value>
+    </data>
+    <data name="OSVersion" xml:space="preserve">
+        <value>Версия ОС</value>
+    </data>
+    <data name="AppVersion" xml:space="preserve">
+        <value>Версия приложения</value>
+    </data>
+    <data name="Architecture" xml:space="preserve">
+        <value>Архитектура</value>
+    </data>
+    <data name="Creator" xml:space="preserve">
+        <value>Создатель</value>
+    </data>
+    <data name="Repeat" xml:space="preserve">
+        <value>Повторить вкл/выкл</value>
+    </data>
+    <data name="VolumeMinus" xml:space="preserve">
+        <value>Громкость +</value>
+    </data>
+    <data name="VolumePlus" xml:space="preserve">
+        <value>Громкость -</value>
+    </data>
+    <data name="Delete" xml:space="preserve">
+        <value>Удалить</value>
+    </data>
+    <data name="MediaDown" xml:space="preserve">
+        <value>Вниз</value>
+    </data>
+    <data name="MediaUp" xml:space="preserve">
+        <value>Верх</value>
     </data>
 </root>

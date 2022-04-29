@@ -1,9 +1,9 @@
-﻿using System;
+﻿using NedoPlayer.Models;
 using NedoPlayer.NedoEventAggregator;
 
 namespace NedoPlayer.Utils;
 
-class PlayPauseState : PubSubEvent { }
-class MaximizePlayer : PubSubEvent<bool> { }
-class ChangeVolume : PubSubEvent<double> { }
-class MuteAudio : PubSubEvent<bool> { }
+class PlaylistUpdateEvent : PubSubEvent<Playlist> { }
+class UpdatePlayedMediaIndex : PubSubEvent<int> { }
+class ClosePlaylistWindowEvent : PubSubEvent { }
+class CloseAllWindowEvent : PubSubEvent { }

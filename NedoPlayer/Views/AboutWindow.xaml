@@ -1,0 +1,97 @@
+﻿<mah:MetroWindow x:Class="NedoPlayer.Views.AboutWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:local="clr-namespace:NedoPlayer.Views"
+                 xmlns:p="clr-namespace:NedoPlayer.Resources"
+                 xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                 xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+                 mc:Ignorable="d"
+                 ResizeMode="NoResize"
+                 Title="{x:Static p:Resource.About}" Height="350" Width="300"
+                 DataContext="{Binding AboutViewModel, Source={StaticResource ViewModelLocator}}">
+    <mah:MetroWindow.IconTemplate>
+        <DataTemplate>
+            <iconPacks:PackIconMaterial VerticalAlignment="Center" HorizontalAlignment="Center"
+                                        Kind="Information" />
+        </DataTemplate>
+    </mah:MetroWindow.IconTemplate>
+    <Grid Background="{DynamicResource MahApps.Brushes.Flyout.Background}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0"
+              Margin="0 10">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Image Grid.Row="0"
+                   Source="../Resources/img/logo.png"
+                   RenderOptions.BitmapScalingMode="HighQuality"
+                   Margin="10"
+                   Width="100" Height="100"></Image>
+            <TextBlock Grid.Row="1"
+                       Foreground="{DynamicResource MahApps.Brushes.IdealForeground}"
+                       Margin="0 10"
+                       VerticalAlignment="Center" HorizontalAlignment="Center"
+                       Text="NedoPlayer" 
+                       FontWeight="Bold" FontSize="25" />
+            <TextBlock Grid.Row="2"
+                       Foreground="{DynamicResource MahApps.Brushes.IdealForeground}"
+                       VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock.Text>
+                    <MultiBinding StringFormat="{}{0}: {1}">
+                        <Binding Source="{x:Static p:Resource.AppVersion}" />
+                        <Binding Path="AppVersion" Mode="OneWay" />
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
+            <TextBlock Grid.Row="3"
+                       Foreground="{DynamicResource MahApps.Brushes.IdealForeground}"
+                       VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock.Text>
+                    <MultiBinding StringFormat="{}{0}: {1}">
+                        <Binding Source="{x:Static p:Resource.OSVersion}" />
+                        <Binding Path="OsName" Mode="OneWay"></Binding>
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
+            <TextBlock Grid.Row="4"
+                       Foreground="{DynamicResource MahApps.Brushes.IdealForeground}"
+                       VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock.Text>
+                    <MultiBinding StringFormat="{}{0}: {1}">
+                        <Binding Source="{x:Static p:Resource.Architecture}" />
+                        <Binding Path="Architecture"/>
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
+            <TextBlock Grid.Row="5"
+                       Foreground="{DynamicResource MahApps.Brushes.IdealForeground}"
+                       VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock.Text>
+                    <MultiBinding StringFormat="{}{0}: {1}">
+                        <Binding Source="{x:Static p:Resource.Creator}" />
+                        <Binding Path="NicknameCreator" />
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
+        </Grid>
+        <Button Grid.Row="1"
+                IsCancel="True"
+                Style="{StaticResource MahApps.Styles.Button}"
+                Margin="10"
+                Width="75" Height="25" 
+                VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                Content="Ok"
+                Command="{Binding CloseCommand}"/>
+    </Grid>
+</mah:MetroWindow>

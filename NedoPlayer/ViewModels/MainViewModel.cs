@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 using MahApps.Metro.Controls;
 using Microsoft.WindowsAPICodePack.Shell;
 using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
@@ -13,8 +16,10 @@ using NedoPlayer.Models;
 using NedoPlayer.NedoEventAggregator;
 using NedoPlayer.Services;
 using NedoPlayer.Utils;
+using NedoPlayer.Views;
 using Unosquare.FFME.Common;
 using MediaInfo = NedoPlayer.Models.MediaInfo;
+#pragma warning disable CS8618
 
 namespace NedoPlayer.ViewModels;
 
@@ -23,7 +28,11 @@ public sealed class MainViewModel : BaseViewModel
     public MediaControlController MediaControlController { get; }
     private readonly IOService _fileDialogService;
     private readonly IStateService _windowStateService;
+    private readonly IWindowService _windowService;
+    private readonly IConfigFileService _configFileService;
     private int _playedMediaIndex;
+    private int _prevPlayedMediaIndex;
+    private bool _isPlaylistOpenedInWindow;
 
     private string _trackTitle;
     public string TrackTitle
@@ -92,7 +101,8 @@ public sealed class MainViewModel : BaseViewModel
         get => _volume;
         set
         {
-            _volume = value;
+            _volume = value < 0 ? 0 : value > 100 ? 100 : value;
+            _configFileService.Write("Volume", _volume.ToString(CultureInfo.InvariantCulture));
             VolumeToFfmpeg = value / 100;
             OnPropertyChanged(nameof(Volume));
         }
@@ -116,6 +126,7 @@ public sealed class MainViewModel : BaseViewModel
         set
         {
             _isMuted = value;
+            _configFileService.Write("IsMuted", _isMuted.ToString(CultureInfo.InvariantCulture));
             OnPropertyChanged(nameof(IsMuted));
         }
     }
@@ -126,7 +137,7 @@ public sealed class MainViewModel : BaseViewModel
         get => _isPlayListOpened;
         set
         {
-            _isPlayListOpened = value;
+            _isPlayListOpened = value && !_isPlaylistOpenedInWindow;
             OnPropertyChanged(nameof(IsPlayListOpened));
         }
     }
@@ -165,49 +176,92 @@ public sealed class MainViewModel : BaseViewModel
         }
     }
 
-    public ICommand CloseCommand { get; }
-    public ICommand PlayPauseCommand { get; }
-    public ICommand MaximizeCommand { get; }
-    public ICommand MuteCommand { get; }
-    public ICommand MediaOpenedCommand { get; }
-    public ICommand OpenPlaylistCommand { get; }
-    public ICommand MediaEndedCommand { get; }
+    public ICommand CloseCommand { get; private set; }
+    public ICommand PlayPauseCommand { get; private set; }
+    public ICommand MaximizeCommand { get; private set; }
+    public ICommand MuteCommand { get; private set; }
+    public ICommand MediaOpenedCommand { get; private set; }
+    public ICommand OpenPlaylistCommand { get; private set; }
+    public ICommand MediaEndedCommand { get; private set; }
+    public ICommand NextMediaCommand { get; private set; }
+    public ICommand PreviousMediaCommand { get; private set; }
+    public ICommand OpenFileCommand { get; private set; }
+    public ICommand OpenFolderCommand { get; private set; }
+    public ICommand AddFileToPlaylistCommand { get; private set; }
+    public ICommand AddFolderToPlaylistCommand { get; private set; }
+    public ICommand DeleteMediaFromPlaylistCommand { get; private set; }
+    public ICommand RepeatMediaCommand { get; private set; }
+    public ICommand RepeatCurrentMediaCommand { get; private set; }
+    public ICommand PlusVolumeCommand { get; private set; }
+    public ICommand MinusVolumeCommand { get; private set; }
+    public ICommand OpenAboutCommand { get; private set; }
+    public ICommand OpenPlaylistInWindowCommand { get; private set; }
 
-    public ICommand NextMediaCommand { get; }
-    public ICommand PreviousMediaCommand { get; }
-    public ICommand OpenFileCommand { get; }
-    public ICommand OpenFolderCommand { get; }
-    public ICommand AddFileToPlaylistCommand { get; }
-    public ICommand AddFolderToPlaylistCommand { get; }
-    public ICommand DeleteMediaFromPlaylistCommand { get; }
-    public ICommand RepeatMediaCommand { get; }
-    public ICommand RepeatCurrentMediaCommand { get; }
-    
-    public MainViewModel(IEventAggregator aggregator, IOService fileService, IStateService windowStateService) : base(aggregator)
+    private DispatcherTimer _timerToEnd;
+
+    public MainViewModel(IEventAggregator aggregator, IOService fileService, IStateService windowStateService,
+        IWindowService windowService, IConfigFileService configFileService) : base(aggregator)
     {
         MediaControlController = new MediaControlController(this);
         _fileDialogService = fileService;
         _windowStateService = windowStateService;
+        _windowService = windowService;
+        _configFileService = configFileService;
         _trackTitle = "";
         _isPaused = true;
         _position = TimeSpan.FromSeconds(0);
         _totalDuration = TimeSpan.Zero;
-        _volume = 100;
+
+        _volume = _configFileService.KeyExists("Volume")
+            ? _configFileService.Read<double>("Volume")
+            : 100;
+
         _volumeToFfmpeg = _volume / 100;
-        _isMuted = false;
+
+        _isMuted = _configFileService.KeyExists("IsMuted") && _configFileService.Read<bool>("IsMuted");
         _isPlayListOpened = false;
+        _isPlaylistOpenedInWindow = false;
         _playedMediaIndex = 0;
         _playlist = new Playlist();
         _playedMediaIndex = -1;
+        _prevPlayedMediaIndex = _playedMediaIndex;
         _selectedMediaIndex = -1;
         _currentMedia = new MediaInfo(-1);
 
-        CloseCommand = new RelayCommand(_ => MediaControlController.Close());
+        Aggregator.GetEvent<ClosePlaylistWindowEvent>().Subscribe(() => _isPlaylistOpenedInWindow = false);
+        
+        InitCommands();
+
+        _timerToEnd = new DispatcherTimer(DispatcherPriority.Background)
+        {
+            IsEnabled = true,
+            Interval = TimeSpan.Zero
+        };
+
+        _timerToEnd.Tick += (_, _) =>
+        {
+            if (Position != CurrentMedia.Duration)
+                return;
+            if (!Playlist.MediaInfos.Any() || _playedMediaIndex == Playlist.MediaInfos.Count - 1 || CurrentMedia.Repeat)
+                return;
+            
+            NextMediaFile();
+        };
+    }
+
+    private void InitCommands()
+    {
+        CloseCommand = new RelayCommand(_ =>
+        {
+            Aggregator.GetEvent<CloseAllWindowEvent>().Publish();
+            MediaControlController.Close();
+        });
         PlayPauseCommand = new RelayCommand( _ => PlayPauseSwitch(), _ => Playlist.MediaInfos.Any());
         MaximizeCommand = new RelayCommand(_ => Maximize());
         MuteCommand = new RelayCommand(_ => IsMuted = !IsMuted);
         MediaOpenedCommand = new RelayCommand(MediaOpened);
-        OpenPlaylistCommand = new RelayCommand(_ => IsPlayListOpened = !IsPlayListOpened);
+        OpenPlaylistCommand =
+            new RelayCommand(_ => IsPlayListOpened = !IsPlayListOpened, _ => !_isPlaylistOpenedInWindow);
         MediaEndedCommand = new RelayCommand(MediaEnded);
 
         NextMediaCommand =
@@ -221,11 +275,17 @@ public sealed class MainViewModel : BaseViewModel
 
         DeleteMediaFromPlaylistCommand = new RelayCommand(_ => DeleteMediaFile(), _ => Playlist.MediaInfos.Any());
         RepeatMediaCommand = new RelayCommand(
-                _ => Playlist.MediaInfos[SelectedMediaIndex].Repeat = !Playlist.MediaInfos[SelectedMediaIndex].Repeat,
-                _ => Playlist.MediaInfos.Any()
-                );
+            _ => Playlist[SelectedMediaIndex].Repeat = !Playlist[SelectedMediaIndex].Repeat,
+            _ => Playlist.MediaInfos.Any()
+        );
         RepeatCurrentMediaCommand = new RelayCommand(_ => CurrentMedia.Repeat = !CurrentMedia.Repeat,
             _ => Playlist.MediaInfos.Any());
+
+        PlusVolumeCommand = new RelayCommand(_ => Volume += 5, _ => !IsMuted);
+        MinusVolumeCommand = new RelayCommand(_ => Volume -= 5, _ => !IsMuted);
+        OpenAboutCommand = new RelayCommand(_ => _windowService.OpenDialogWindow<AboutWindow>());
+
+        OpenPlaylistInWindowCommand = new RelayCommand(_ => OpenPlaylistInWindow());
     }
 
     private void PlayPauseSwitch()
@@ -318,15 +378,17 @@ public sealed class MainViewModel : BaseViewModel
     /// </summary>
     private void NextMediaFile()
     {
-        if (_playedMediaIndex == Playlist.MediaInfos.Count - 1) return;
+        if (_playedMediaIndex >= Playlist.MediaInfos.Count - 1) return;
         if (_playedMediaIndex > -1)
-            Playlist.MediaInfos[_playedMediaIndex].IsPlaying = false;
-        
+            Playlist[_playedMediaIndex].IsPlaying = false;
+
+        _prevPlayedMediaIndex = _playedMediaIndex;
         ++_playedMediaIndex;
 
-        Playlist.MediaInfos[_playedMediaIndex].IsPlaying = true;
-        MediaInfo info = Playlist.MediaInfos[_playedMediaIndex];
+        Playlist[_playedMediaIndex].IsPlaying = true;
+        MediaInfo info = Playlist[_playedMediaIndex];
         MediaControlController.OpenMediaFile(info.Path + info.Title);
+        Aggregator.GetEvent<UpdatePlayedMediaIndex>().Publish(_playedMediaIndex);
     }
 
     /// <summary>
@@ -337,12 +399,15 @@ public sealed class MainViewModel : BaseViewModel
         if (_playedMediaIndex is < 0 or 0)
             return;
             
-        Playlist.MediaInfos[_playedMediaIndex].IsPlaying = false;
-        --_playedMediaIndex;
+        Playlist[_playedMediaIndex].IsPlaying = false;
+        
+        _prevPlayedMediaIndex = _playedMediaIndex;
+        _playedMediaIndex--;
 
-        Playlist.MediaInfos[_playedMediaIndex].IsPlaying = true;
-        MediaInfo info = Playlist.MediaInfos[_playedMediaIndex];
+        Playlist[_playedMediaIndex].IsPlaying = true;
+        MediaInfo info = Playlist[_playedMediaIndex];
         MediaControlController.OpenMediaFile(info.Path + info.Title);
+        Aggregator.GetEvent<UpdatePlayedMediaIndex>().Publish(_playedMediaIndex);
     }
 
     /// <summary>
@@ -351,13 +416,17 @@ public sealed class MainViewModel : BaseViewModel
     /// <param name="o">Args from media opened event</param>
     private void MediaOpened(object? o)
     {
-        if (o is not MediaOpenedEventArgs args)
+        if (o is not RoutedEventArgs {Source: MediaElement me})
             return;
-            
-        TotalDuration = args.Info.Duration;
-        Position = args.Info.StartTime;
-        TrackTitle = $"{args.Info.MediaSource}";
-        CurrentMedia = Playlist.MediaInfos[_playedMediaIndex];
+
+        // TotalDuration = args.Info.Duration;
+        // Position = args.Info.StartTime;
+        // TrackTitle = $"{args.Info.MediaSource}";
+        CurrentMedia = Playlist[_playedMediaIndex];
+        TotalDuration = me.NaturalDuration.TimeSpan;
+        Position = TimeSpan.Zero;
+        TrackTitle = CurrentMedia.Title;
+
         if (!IsPaused) 
             MediaControlController.Play();
     }
@@ -371,11 +440,7 @@ public sealed class MainViewModel : BaseViewModel
         if (!Playlist.MediaInfos.Any() || _playedMediaIndex == Playlist.MediaInfos.Count - 1 || CurrentMedia.Repeat)
             return;
 
-        Playlist.MediaInfos[_playedMediaIndex].IsPlaying = false;
-        ++_playedMediaIndex;
-        Playlist.MediaInfos[_playedMediaIndex].IsPlaying = true;
-        MediaInfo info = Playlist.MediaInfos[_playedMediaIndex];
-        MediaControlController.OpenMediaFile(info.Path + info.Title);
+        NextMediaFile();
     }
 
     /// <summary>
@@ -410,6 +475,14 @@ public sealed class MainViewModel : BaseViewModel
         Playlist.MediaInfos.RemoveAt(SelectedMediaIndex);
         var temp = Playlist.MediaInfos.AsEnumerable();
         Playlist.MediaInfos = new(temp);
+    }
+    
+    private void OpenPlaylistInWindow()
+    {
+        _windowService.OpenWindow<PlaylistWindow>();
+        IsPlayListOpened = false;
+        _isPlaylistOpenedInWindow = true;
+        Aggregator.GetEvent<PlaylistUpdateEvent>().Publish(Playlist);
     }
 
     /// <summary>
@@ -457,7 +530,8 @@ public sealed class MainViewModel : BaseViewModel
     {
         if (Playlist.MediaInfos.Count > 1 || _playedMediaIndex > -1)
             return;
-            
+
+        IsPaused = false;
         NextMediaFile();
     }
     

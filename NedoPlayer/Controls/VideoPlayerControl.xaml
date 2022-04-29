@@ -196,13 +196,13 @@
                             IsEnabled="{Binding IsMuted, ElementName=This, Converter={StaticResource InverseBoolConverter}, PresentationTraceSources.TraceLevel=High}">
                     </Slider>
                 </Grid>
-                <Button VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Playlist"
+                <Button VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="{x:Static p:Resource.Repeat}"
                         Width="35" Height="35" Margin="5 0"
                         Style="{DynamicResource MahApps.Styles.Button.Circle}"
                         Command="{Binding RepeatCommand, ElementName=This}">
                     <iconPacks:PackIconMaterial Kind="{Binding IsRepeated, ElementName=This, Converter={StaticResource BoolToRepeatIconConverter}}" />
                 </Button>
-                <Button VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Playlist"
+                <Button VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="{x:Static p:Resource.Playlist}"
                         Width="35" Height="35" Margin="5 0"
                         Style="{DynamicResource MahApps.Styles.Button.Circle}"
                         Command="{Binding OpenPlaylistCommand, ElementName=This}">

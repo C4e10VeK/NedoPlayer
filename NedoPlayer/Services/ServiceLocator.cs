@@ -11,5 +11,7 @@ public class ServiceLocator
         Container = new ServiceContainer();
         Container.Bind<IOService, FileService>();
         Container.Bind<IStateService, WindowStateService>();
+        Container.Bind<IWindowService, WindowService>();
+        Container.Bind<IConfigFileService, ConfigFileService>();
     }
 }

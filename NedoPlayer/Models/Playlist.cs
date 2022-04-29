@@ -34,4 +34,10 @@ public class Playlist : ModelBase
         _mediaInfos = new ObservableCollection<MediaInfo>();
         _totalDuration = TimeSpan.Zero;
     }
+
+    public MediaInfo this[int index]
+    {
+        get => MediaInfos[index];
+        set => MediaInfos[index] = value;
+    }
 }

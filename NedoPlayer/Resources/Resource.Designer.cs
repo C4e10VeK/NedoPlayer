@@ -88,11 +88,47 @@ namespace NedoPlayer.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to App version.
+        /// </summary>
+        public static string AppVersion {
+            get {
+                return ResourceManager.GetString("AppVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Architecture.
+        /// </summary>
+        public static string Architecture {
+            get {
+                return ResourceManager.GetString("Architecture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Audio.
         /// </summary>
         public static string Audio {
             get {
                 return ResourceManager.GetString("Audio", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Creator.
+        /// </summary>
+        public static string Creator {
+            get {
+                return ResourceManager.GetString("Creator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete.
+        /// </summary>
+        public static string Delete {
+            get {
+                return ResourceManager.GetString("Delete", resourceCulture);
             }
         }
         
@@ -124,6 +160,15 @@ namespace NedoPlayer.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Down.
+        /// </summary>
+        public static string MediaDown {
+            get {
+                return ResourceManager.GetString("MediaDown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to mp4 files (*.mp4)|*.mp4|mkv files (*.mkv)|*.mkv|flv files (*.flv)|*.flv|webm files (*.webm)|*.webm|mp3 files (*.mp3)|*.mp3|All files (*.*)|*.*.
         /// </summary>
         public static string MediaFileFilter {
@@ -133,7 +178,16 @@ namespace NedoPlayer.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Mute.
+        ///   Looks up a localized string similar to Up.
+        /// </summary>
+        public static string MediaUp {
+            get {
+                return ResourceManager.GetString("MediaUp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mute/Unmute.
         /// </summary>
         public static string Mute {
             get {
@@ -165,6 +219,15 @@ namespace NedoPlayer.Resources {
         public static string OpenFolder {
             get {
                 return ResourceManager.GetString("OpenFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to OS Version.
+        /// </summary>
+        public static string OSVersion {
+            get {
+                return ResourceManager.GetString("OSVersion", resourceCulture);
             }
         }
         
@@ -205,6 +268,15 @@ namespace NedoPlayer.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Repeat on/off.
+        /// </summary>
+        public static string Repeat {
+            get {
+                return ResourceManager.GetString("Repeat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Stop.
         /// </summary>
         public static string Stop {
@@ -219,6 +291,24 @@ namespace NedoPlayer.Resources {
         public static string TotalDuration {
             get {
                 return ResourceManager.GetString("TotalDuration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Volume -.
+        /// </summary>
+        public static string VolumeMinus {
+            get {
+                return ResourceManager.GetString("VolumeMinus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Volume +.
+        /// </summary>
+        public static string VolumePlus {
+            get {
+                return ResourceManager.GetString("VolumePlus", resourceCulture);
             }
         }
     }

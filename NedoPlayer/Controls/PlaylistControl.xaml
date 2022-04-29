@@ -8,7 +8,8 @@
              xmlns:p="clr-namespace:NedoPlayer.Resources"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d"
-             d:DesignHeight="400" d:DesignWidth="300">
+             d:DesignHeight="400" d:DesignWidth="300"
+             Background="{DynamicResource MahApps.Brushes.Flyout.Background}">
     <UserControl.Resources>
         <CollectionViewSource x:Key="Playlist" Source="{Binding PlaylistSource.MediaInfos, ElementName=ThisPlaylistControl}">
             <CollectionViewSource.GroupDescriptions>
@@ -97,23 +98,23 @@
         </Style>
         
         <ContextMenu x:Key="PlaylistMenu">
-            <MenuItem Header="Up">
+            <MenuItem Header="{x:Static p:Resource.MediaUp}">
                 <MenuItem.Icon>
                     <iconPacks:PackIconMaterial Kind="ArrowUp"></iconPacks:PackIconMaterial>
                 </MenuItem.Icon>
             </MenuItem>
-            <MenuItem Header="Down">
+            <MenuItem Header="{x:Static p:Resource.MediaDown}">
                 <MenuItem.Icon>
                     <iconPacks:PackIconMaterial Kind="ArrowDown"></iconPacks:PackIconMaterial>
                 </MenuItem.Icon>
             </MenuItem>
-            <MenuItem Header="Repeat"
+            <MenuItem Header="{x:Static p:Resource.Repeat}"
                       Command="{Binding RepeatMediaCommand, Source={x:Reference ThisPlaylistControl}}">
                 <MenuItem.Icon>
                     <iconPacks:PackIconMaterial Kind="Repeat"></iconPacks:PackIconMaterial>
                 </MenuItem.Icon>
             </MenuItem>
-            <MenuItem Header="Delete"
+            <MenuItem Header="{x:Static p:Resource.Delete}"
                       Command="{Binding DeleteMediaCommand, Source={x:Reference ThisPlaylistControl}}">
                 <MenuItem.Icon>
                     <iconPacks:PackIconMaterial Kind="Delete"></iconPacks:PackIconMaterial>
@@ -121,19 +122,20 @@
             </MenuItem>
         </ContextMenu>
     </UserControl.Resources>
-    <Grid>
+    <Grid Background="{DynamicResource MahApps.Brushes.Flyout.Background}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <ListView Style="{StaticResource MahApps.Styles.ListView}"
-                  Background="{DynamicResource MahApps.Brushes.Flyout.Background}"
+        <ListView Grid.Row="0"
+                  Style="{StaticResource MahApps.Styles.ListView}"
                   ContextMenu="{StaticResource PlaylistMenu}"
                   ItemsSource="{Binding Source={StaticResource Playlist}}"
                   SelectedIndex="{Binding SelectedMediaIndex, ElementName=ThisPlaylistControl}"
                   SelectedItem="{Binding SelectedMedia, ElementName=ThisPlaylistControl}"
-                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                  SizeChanged="FrameworkElement_OnSizeChanged" SelectionMode="Single">
+                  SelectionMode="Single"
+                  ScrollViewer.CanContentScroll="True"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto" >
             <ListView.GroupStyle>
                 <GroupStyle>
                     <GroupStyle.ContainerStyle>
@@ -147,8 +149,8 @@
                                                   Style="{StaticResource PlaylistExpanderStyle}">
                                             <Expander.Header>
                                                 <DockPanel LastChildFill="False" HorizontalAlignment="Stretch">
-                                                    <TextBlock DockPanel.Dock="Left" 
-                                                               FontWeight="Bold" 
+                                                    <TextBlock DockPanel.Dock="Left"
+                                                               FontWeight="Bold"
                                                                Text="{Binding Items, Converter={StaticResource ItemsToFolderNameConverter}}"
                                                                Margin="5,0,0,0" />
                                                     <TextBlock DockPanel.Dock="Right"
@@ -172,14 +174,17 @@
                 <DataTemplate>
                     <DockPanel LastChildFill="False" HorizontalAlignment="Stretch">
                         <TextBlock DockPanel.Dock="Left" Text="{Binding Title}"
-                                   Foreground="{Binding IsPlaying, Converter={StaticResource BoolToPlayingColorConverter}}"/>
-                        <iconPacks:PackIconMaterial Margin="5 0 0 0" Kind="{Binding Repeat, Converter={StaticResource IntToRepeatKindConverter}}"/>
-                        <TextBlock DockPanel.Dock="Right" Text="{Binding Duration, StringFormat={}{0:hh\\:mm\\:ss}}" />
+                                   Foreground="{Binding IsPlaying, Converter={StaticResource BoolToPlayingColorConverter}}" />
+                        <iconPacks:PackIconMaterial Margin="5 0 0 0"
+                                                    Kind="{Binding Repeat, Converter={StaticResource IntToRepeatKindConverter}}" />
+                        <TextBlock DockPanel.Dock="Right"
+                                   Text="{Binding Duration, StringFormat={}{0:hh\\:mm\\:ss}}" />
                     </DockPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
         <TextBlock Grid.Row="1"
+                   Background="{DynamicResource MahApps.Brushes.Flyout.Background}"
                    Margin="10 0" HorizontalAlignment="Right"
                    FontWeight="Bold">
             <TextBlock.Text>
