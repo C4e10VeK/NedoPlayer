@@ -176,7 +176,7 @@
                         <TextBlock DockPanel.Dock="Left" Text="{Binding Title}"
                                    Foreground="{Binding IsPlaying, Converter={StaticResource BoolToPlayingColorConverter}}" />
                         <iconPacks:PackIconMaterial Margin="5 0 0 0"
-                                                    Kind="{Binding Repeat, Converter={StaticResource IntToRepeatKindConverter}}" />
+                                                    Kind="{Binding IsRepeat, Converter={StaticResource IntToRepeatKindConverter}}" />
                         <TextBlock DockPanel.Dock="Right"
                                    Text="{Binding Duration, StringFormat={}{0:hh\\:mm\\:ss}}" />
                     </DockPanel>

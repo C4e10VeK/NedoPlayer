@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
-using Microsoft.Xaml.Behaviors.Core;
 using NedoPlayer.Models;
 using NedoPlayer.NedoEventAggregator;
 using NedoPlayer.Utils;
@@ -39,19 +39,25 @@ public class PlaylistViewModel : BaseViewModel
     public ICommand DeleteMediaFromPlaylistCommand { get; }
     public ICommand RepeatMediaCommand { get; }
     public ICommand CloseCommand { get; }
+
+    private readonly SubscriptionToken _playlistUpdateToken;
+    private readonly SubscriptionToken _updatePlayedMediaIndexToken;
+    private readonly SubscriptionToken _closeAllWindowToken;
     
     public PlaylistViewModel(IEventAggregator aggregator) : base(aggregator)
     {
         _playlist = new Playlist();
         _playedMediaIndex = -1;
 
-        Aggregator.GetEvent<PlaylistUpdateEvent>().Subscribe(playlist => Playlist = playlist);
-        Aggregator.GetEvent<UpdatePlayedMediaIndex>().Subscribe(index => _playedMediaIndex = index);
-        Aggregator.GetEvent<CloseAllWindowEvent>().Subscribe(() => CloseRequested?.Invoke(this, EventArgs.Empty));
+        _playlistUpdateToken = Aggregator.GetEvent<PlaylistUpdateEvent>().Subscribe(playlist => Playlist = playlist);
+        _updatePlayedMediaIndexToken = Aggregator.GetEvent<UpdatePlayedMediaIndexEvent>().Subscribe(index => _playedMediaIndex = index);
+        _closeAllWindowToken = Aggregator.GetEvent<CloseAllWindowEvent>().Subscribe(() => CloseRequested?.Invoke(this, EventArgs.Empty));
 
-        DeleteMediaFromPlaylistCommand = new RelayCommand(_ => DeleteMediaFile(), _ => Playlist.MediaInfos.Any());
+        DeleteMediaFromPlaylistCommand =
+            new RelayCommand(_ => Aggregator.GetEvent<DeleteMediaEvent>().Publish(SelectedMediaIndex),
+                _ => Playlist.MediaInfos.Any());
         RepeatMediaCommand = new RelayCommand(
-            _ => Playlist[SelectedMediaIndex].Repeat = !Playlist[SelectedMediaIndex].Repeat,
+            _ => Aggregator.GetEvent<RepeatMediaEvent>().Publish(SelectedMediaIndex),
             _ => Playlist.MediaInfos.Any()
         );
 
@@ -61,14 +67,9 @@ public class PlaylistViewModel : BaseViewModel
     private void Close(object? obj)
     {
         Aggregator.GetEvent<ClosePlaylistWindowEvent>().Publish();
+        Aggregator.GetEvent<PlaylistUpdateEvent>().Unsubscribe(_playlistUpdateToken);
+        Aggregator.GetEvent<UpdatePlayedMediaIndexEvent>().Unsubscribe(_updatePlayedMediaIndexToken);
+        Aggregator.GetEvent<CloseAllWindowEvent>().Unsubscribe(_closeAllWindowToken);
         CloseRequested?.Invoke(this, EventArgs.Empty);
-    }
-    
-    private void DeleteMediaFile()
-    {
-        if (_playedMediaIndex == SelectedMediaIndex) return;
-        Playlist.MediaInfos.RemoveAt(SelectedMediaIndex);
-        var temp = Playlist.MediaInfos.AsEnumerable();
-        Playlist.MediaInfos = new(temp);
     }
 }

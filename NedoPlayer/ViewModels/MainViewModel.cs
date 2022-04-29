@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -7,7 +8,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Threading;
 using MahApps.Metro.Controls;
 using Microsoft.WindowsAPICodePack.Shell;
 using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
@@ -17,7 +17,6 @@ using NedoPlayer.NedoEventAggregator;
 using NedoPlayer.Services;
 using NedoPlayer.Utils;
 using NedoPlayer.Views;
-using Unosquare.FFME.Common;
 using MediaInfo = NedoPlayer.Models.MediaInfo;
 #pragma warning disable CS8618
 
@@ -31,7 +30,6 @@ public sealed class MainViewModel : BaseViewModel
     private readonly IWindowService _windowService;
     private readonly IConfigFileService _configFileService;
     private int _playedMediaIndex;
-    private int _prevPlayedMediaIndex;
     private bool _isPlaylistOpenedInWindow;
 
     private string _trackTitle;
@@ -197,8 +195,6 @@ public sealed class MainViewModel : BaseViewModel
     public ICommand OpenAboutCommand { get; private set; }
     public ICommand OpenPlaylistInWindowCommand { get; private set; }
 
-    private DispatcherTimer _timerToEnd;
-
     public MainViewModel(IEventAggregator aggregator, IOService fileService, IStateService windowStateService,
         IWindowService windowService, IConfigFileService configFileService) : base(aggregator)
     {
@@ -224,29 +220,14 @@ public sealed class MainViewModel : BaseViewModel
         _playedMediaIndex = 0;
         _playlist = new Playlist();
         _playedMediaIndex = -1;
-        _prevPlayedMediaIndex = _playedMediaIndex;
         _selectedMediaIndex = -1;
         _currentMedia = new MediaInfo(-1);
 
         Aggregator.GetEvent<ClosePlaylistWindowEvent>().Subscribe(() => _isPlaylistOpenedInWindow = false);
+        Aggregator.GetEvent<DeleteMediaEvent>().Subscribe(DeleteMediaFile);
+        Aggregator.GetEvent<RepeatMediaEvent>().Subscribe(RepeatSelectedMedia);
         
         InitCommands();
-
-        _timerToEnd = new DispatcherTimer(DispatcherPriority.Background)
-        {
-            IsEnabled = true,
-            Interval = TimeSpan.Zero
-        };
-
-        _timerToEnd.Tick += (_, _) =>
-        {
-            if (Position != CurrentMedia.Duration)
-                return;
-            if (!Playlist.MediaInfos.Any() || _playedMediaIndex == Playlist.MediaInfos.Count - 1 || CurrentMedia.Repeat)
-                return;
-            
-            NextMediaFile();
-        };
     }
 
     private void InitCommands()
@@ -273,17 +254,17 @@ public sealed class MainViewModel : BaseViewModel
         AddFileToPlaylistCommand = new RelayCommand(_ => AddFileToPlaylist());
         AddFolderToPlaylistCommand = new RelayCommand(_ => AddFolderToPlaylist());
 
-        DeleteMediaFromPlaylistCommand = new RelayCommand(_ => DeleteMediaFile(), _ => Playlist.MediaInfos.Any());
+        DeleteMediaFromPlaylistCommand = new RelayCommand(_ => DeleteMediaFile(SelectedMediaIndex), _ => Playlist.MediaInfos.Any());
         RepeatMediaCommand = new RelayCommand(
-            _ => Playlist[SelectedMediaIndex].Repeat = !Playlist[SelectedMediaIndex].Repeat,
+            _ => RepeatSelectedMedia(SelectedMediaIndex),
             _ => Playlist.MediaInfos.Any()
         );
-        RepeatCurrentMediaCommand = new RelayCommand(_ => CurrentMedia.Repeat = !CurrentMedia.Repeat,
+        RepeatCurrentMediaCommand = new RelayCommand(_ => CurrentMedia.IsRepeat = !CurrentMedia.IsRepeat,
             _ => Playlist.MediaInfos.Any());
 
         PlusVolumeCommand = new RelayCommand(_ => Volume += 5, _ => !IsMuted);
         MinusVolumeCommand = new RelayCommand(_ => Volume -= 5, _ => !IsMuted);
-        OpenAboutCommand = new RelayCommand(_ => _windowService.OpenDialogWindow<AboutWindow>());
+        OpenAboutCommand = new RelayCommand(_ => _windowService.OpenWindow<AboutWindow>(Application.Current.MainWindow));
 
         OpenPlaylistInWindowCommand = new RelayCommand(_ => OpenPlaylistInWindow());
     }
@@ -380,15 +361,17 @@ public sealed class MainViewModel : BaseViewModel
     {
         if (_playedMediaIndex >= Playlist.MediaInfos.Count - 1) return;
         if (_playedMediaIndex > -1)
+        {
             Playlist[_playedMediaIndex].IsPlaying = false;
+            Playlist[_playedMediaIndex].IsRepeat = false;
+        }
 
-        _prevPlayedMediaIndex = _playedMediaIndex;
         ++_playedMediaIndex;
 
         Playlist[_playedMediaIndex].IsPlaying = true;
         MediaInfo info = Playlist[_playedMediaIndex];
         MediaControlController.OpenMediaFile(info.Path + info.Title);
-        Aggregator.GetEvent<UpdatePlayedMediaIndex>().Publish(_playedMediaIndex);
+        Aggregator.GetEvent<UpdatePlayedMediaIndexEvent>().Publish(_playedMediaIndex);
     }
 
     /// <summary>
@@ -400,14 +383,14 @@ public sealed class MainViewModel : BaseViewModel
             return;
             
         Playlist[_playedMediaIndex].IsPlaying = false;
-        
-        _prevPlayedMediaIndex = _playedMediaIndex;
+        Playlist[_playedMediaIndex].IsRepeat = false;
+
         _playedMediaIndex--;
 
         Playlist[_playedMediaIndex].IsPlaying = true;
         MediaInfo info = Playlist[_playedMediaIndex];
         MediaControlController.OpenMediaFile(info.Path + info.Title);
-        Aggregator.GetEvent<UpdatePlayedMediaIndex>().Publish(_playedMediaIndex);
+        Aggregator.GetEvent<UpdatePlayedMediaIndexEvent>().Publish(_playedMediaIndex);
     }
 
     /// <summary>
@@ -437,8 +420,14 @@ public sealed class MainViewModel : BaseViewModel
     /// <param name="o"></param>
     private void MediaEnded(object? o)
     {
-        if (!Playlist.MediaInfos.Any() || _playedMediaIndex == Playlist.MediaInfos.Count - 1 || CurrentMedia.Repeat)
+        if (!Playlist.MediaInfos.Any() || _playedMediaIndex == Playlist.MediaInfos.Count - 1)
             return;
+
+        if (CurrentMedia.IsRepeat)
+        {
+            Position = TimeSpan.Zero;
+            return;
+        }
 
         NextMediaFile();
     }
@@ -469,17 +458,23 @@ public sealed class MainViewModel : BaseViewModel
         }
     }
     
-    private void DeleteMediaFile()
+    private void DeleteMediaFile(int selectedIndex)
     {
-        if (_playedMediaIndex == SelectedMediaIndex) return;
-        Playlist.MediaInfos.RemoveAt(SelectedMediaIndex);
+        if (_playedMediaIndex == selectedIndex) return;
+        Playlist.MediaInfos.RemoveAt(selectedIndex);
         var temp = Playlist.MediaInfos.AsEnumerable();
-        Playlist.MediaInfos = new(temp);
+        Playlist.MediaInfos = new ObservableCollection<MediaInfo>(temp);
+        
+        if (_playedMediaIndex <= selectedIndex) return;
+        --_playedMediaIndex;
     }
+    
+    private void RepeatSelectedMedia(int selectedIndex) =>
+        Playlist[selectedIndex].IsRepeat = !Playlist[selectedIndex].IsRepeat;
     
     private void OpenPlaylistInWindow()
     {
-        _windowService.OpenWindow<PlaylistWindow>();
+        _windowService.OpenWindow<PlaylistWindow>(Application.Current.MainWindow);
         IsPlayListOpened = false;
         _isPlaylistOpenedInWindow = true;
         Aggregator.GetEvent<PlaylistUpdateEvent>().Publish(Playlist);
