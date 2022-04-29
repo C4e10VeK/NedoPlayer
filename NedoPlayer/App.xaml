@@ -25,7 +25,6 @@
              <converters:BoolToRepeatKindConverter x:Key="IntToRepeatKindConverter" />
              <converters:ItemsToDurationConverter x:Key="TotalDurationConverter" />
              <converters:ItemsToFolderNameConverter x:Key="ItemsToFolderNameConverter" />
-             <converters:BoolToLoopBehaviorConverter x:Key="BoolToLoopBehaviorConverter" />
              <converters:BoolToRepeatIconConverter x:Key="BoolToRepeatIconConverter" />
          </ResourceDictionary>
     </Application.Resources>
