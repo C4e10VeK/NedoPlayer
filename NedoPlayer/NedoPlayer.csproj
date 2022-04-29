@@ -30,25 +30,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Include="lib\swscale-5.dll" />
-      <None Remove="Resources\avcodec-58.dll" />
-      <None Include="lib\avcodec-58.dll" />
-      <None Include="lib\avdevice-58.dll" />
-      <None Include="lib\avfilter-7.dll" />
-      <None Include="lib\avformat-58.dll" />
-      <None Include="lib\avutil-56.dll" />
-      <None Remove="Resources\avdevice-58.dll" />
-      <None Remove="Resources\avfilter-7.dll" />
-      <None Remove="Resources\avformat-58.dll" />
-      <None Remove="Resources\avutil-56.dll" />
-      <None Remove="Resources\postproc-55.dll" />
-      <None Remove="Resources\swresample-3.dll" />
-      <None Include="lib\postproc-55.dll" />
-      <None Remove="Resources\swscale-5.dll" />
-      <None Include="lib\swresample-3.dll" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Resource Include="Resources\img\background.png" />
       <Resource Include="Resources\img\pause.png" />
       <Resource Include="Resources\img\play.png" />

@@ -4,18 +4,17 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
-using MahApps.Metro.Controls;
 using NedoPlayer.ViewModels;
 using Application = System.Windows.Application;
 using Cursors = System.Windows.Input.Cursors;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 
-namespace NedoPlayer;
+namespace NedoPlayer.Views;
 
 /// <summary>
 /// Interaction logic for MainWindow.xaml
 /// </summary>
-public partial class MainWindow : MetroWindow
+public partial class MainWindow
 {
     private readonly DispatcherTimer _timerForHide;
     private DispatcherTimer _timerForPos;
