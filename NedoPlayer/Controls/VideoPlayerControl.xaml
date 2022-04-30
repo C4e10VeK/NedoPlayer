@@ -154,8 +154,7 @@
                     <iconPacks:PackIconMaterial Margin="1 0 0 1"
                                                 Width="20" Height="20"
                                                 VerticalAlignment="Center" HorizontalAlignment="Center"
-                                                Kind="{Binding IsPaused, Converter={StaticResource BoolToPlayPauseKindConverter}}"
-                                                DataContext="{Binding MainViewModel, Source={StaticResource ViewModelLocator}}" />
+                                                Kind="{Binding IsPaused, ElementName=This, Converter={StaticResource BoolToPlayPauseKindConverter}}" />
                     <!-- <Image Width="20" Margin="1 0 0 0" -->
                            <!-- VerticalAlignment="Center" HorizontalAlignment="Center" -->
                            <!-- RenderOptions.BitmapScalingMode="HighQuality" -->

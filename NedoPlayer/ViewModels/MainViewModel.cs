@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -17,7 +16,6 @@ using NedoPlayer.NedoEventAggregator;
 using NedoPlayer.Services;
 using NedoPlayer.Utils;
 using NedoPlayer.Views;
-using MediaInfo = NedoPlayer.Models.MediaInfo;
 #pragma warning disable CS8618
 
 namespace NedoPlayer.ViewModels;
@@ -25,12 +23,18 @@ namespace NedoPlayer.ViewModels;
 public sealed class MainViewModel : BaseViewModel
 {
     public MediaControlController MediaControlController { get; }
-    private readonly IOService _fileDialogService;
-    private readonly IStateService _windowStateService;
-    private readonly IWindowService _windowService;
-    private readonly IConfigFileService _configFileService;
-    private int _playedMediaIndex;
-    private bool _isPlaylistOpenedInWindow;
+
+    private MediaControlModel _mediaControlModel;
+
+    public MediaControlModel MediaControlModel
+    {
+        get => _mediaControlModel;
+        set
+        {
+            _mediaControlModel = value ?? throw new ArgumentNullException(nameof(value));
+            OnPropertyChanged(nameof(MediaControlModel));
+        }
+    }
 
     private string _trackTitle;
     public string TrackTitle
@@ -40,92 +44,6 @@ public sealed class MainViewModel : BaseViewModel
         {
             _trackTitle = value;
             OnPropertyChanged(nameof(TrackTitle));
-        }
-    }
-
-    private TimeSpan _position;
-    public TimeSpan Position
-    {
-        get => _position;
-        set
-        {
-            _position = value;
-            NotifySliderDataChanged();
-        }
-    }
-
-    public double PositionSeconds
-    {
-        get => Position.TotalSeconds;
-        set => Position = TimeSpan.FromSeconds(value);
-    }
-
-    private TimeSpan _totalDuration;
-    public TimeSpan TotalDuration
-    {
-        get => _totalDuration;
-        set
-        {
-            _totalDuration = value;
-            OnPropertyChanged(nameof(TotalDuration));
-        }
-    }
-
-    private bool _isPaused;
-    public bool IsPaused
-    {
-        get => _isPaused;
-        set
-        {
-            _isPaused = value;
-            OnPropertyChanged(nameof(IsPaused));
-        }
-    }
-
-    private bool _isFullscreen;
-    public bool IsFullscreen
-    {
-        get => _isFullscreen;
-        set
-        {
-            _isFullscreen = value;
-            OnPropertyChanged(nameof(IsFullscreen));
-        }
-    }
-
-    private double _volume;
-    public double Volume
-    {
-        get => _volume;
-        set
-        {
-            _volume = value < 0 ? 0 : value > 100 ? 100 : value;
-            _configFileService.Write("Volume", _volume.ToString(CultureInfo.InvariantCulture));
-            VolumeToFfmpeg = value / 100;
-            OnPropertyChanged(nameof(Volume));
-        }
-    }
-
-    private double _volumeToFfmpeg;
-    public double VolumeToFfmpeg
-    {
-        get => _volumeToFfmpeg;
-        set
-        {
-            _volumeToFfmpeg = value;
-            OnPropertyChanged(nameof(VolumeToFfmpeg));
-        }
-    }
-
-    private bool _isMuted;
-    public bool IsMuted
-    {
-        get => _isMuted;
-        set
-        {
-            _isMuted = value;
-            _configFileService.Write("IsMuted", _isMuted.ToString(CultureInfo.InvariantCulture));
-            OnPropertyChanged(nameof(IsMuted));
         }
     }
 
@@ -194,27 +112,31 @@ public sealed class MainViewModel : BaseViewModel
     public ICommand MinusVolumeCommand { get; private set; }
     public ICommand OpenAboutCommand { get; private set; }
     public ICommand OpenPlaylistInWindowCommand { get; private set; }
+    public ICommand ClearPlaylistCommand { get; private set; }
+
+    private readonly IOService _fileDialogService;
+    private readonly IStateService _windowStateService;
+    private readonly IWindowService _windowService;
+    private int _playedMediaIndex;
+    private bool _isPlaylistOpenedInWindow;
+
+    private readonly SubscriptionToken _closePlaylistWindowEventToken;
+    private readonly SubscriptionToken _deleteMediaEventToken;
+    private readonly SubscriptionToken _repeatMediaEventToken;
+    private readonly SubscriptionToken _addMediaFileEventToken;
+    private readonly SubscriptionToken _addFolderEventToken;
+    private readonly SubscriptionToken _clearPlaylistEventToken;
 
     public MainViewModel(IEventAggregator aggregator, IOService fileService, IStateService windowStateService,
         IWindowService windowService, IConfigFileService configFileService) : base(aggregator)
     {
-        MediaControlController = new MediaControlController(this);
         _fileDialogService = fileService;
         _windowStateService = windowStateService;
         _windowService = windowService;
-        _configFileService = configFileService;
+        MediaControlController = new MediaControlController(this);
+        _mediaControlModel = new MediaControlModel(configFileService, MediaControlController);
+        
         _trackTitle = "";
-        _isPaused = true;
-        _position = TimeSpan.FromSeconds(0);
-        _totalDuration = TimeSpan.Zero;
-
-        _volume = _configFileService.KeyExists("Volume")
-            ? _configFileService.Read<double>("Volume")
-            : 100;
-
-        _volumeToFfmpeg = _volume / 100;
-
-        _isMuted = _configFileService.KeyExists("IsMuted") && _configFileService.Read<bool>("IsMuted");
         _isPlayListOpened = false;
         _isPlaylistOpenedInWindow = false;
         _playedMediaIndex = 0;
@@ -223,23 +145,22 @@ public sealed class MainViewModel : BaseViewModel
         _selectedMediaIndex = -1;
         _currentMedia = new MediaInfo(-1);
 
-        Aggregator.GetEvent<ClosePlaylistWindowEvent>().Subscribe(() => _isPlaylistOpenedInWindow = false);
-        Aggregator.GetEvent<DeleteMediaEvent>().Subscribe(DeleteMediaFile);
-        Aggregator.GetEvent<RepeatMediaEvent>().Subscribe(RepeatSelectedMedia);
-        
+        _closePlaylistWindowEventToken = Aggregator.GetEvent<ClosePlaylistWindowEvent>().Subscribe(() => _isPlaylistOpenedInWindow = false);
+        _deleteMediaEventToken = Aggregator.GetEvent<DeleteMediaEvent>().Subscribe(DeleteMediaFile);
+        _repeatMediaEventToken = Aggregator.GetEvent<RepeatMediaEvent>().Subscribe(RepeatSelectedMedia);
+        _addMediaFileEventToken = Aggregator.GetEvent<AddMediaFileEvent>().Subscribe(AddFileToPlaylist);
+        _addFolderEventToken = Aggregator.GetEvent<AddFolderEvent>().Subscribe(AddFolderToPlaylist);
+        _clearPlaylistEventToken = Aggregator.GetEvent<ClearPlaylistEvent>().Subscribe(ClearPlaylist);
+
         InitCommands();
     }
 
     private void InitCommands()
     {
-        CloseCommand = new RelayCommand(_ =>
-        {
-            Aggregator.GetEvent<CloseAllWindowEvent>().Publish();
-            MediaControlController.Close();
-        });
+        CloseCommand = new RelayCommand(Close);
         PlayPauseCommand = new RelayCommand( _ => PlayPauseSwitch(), _ => Playlist.MediaInfos.Any());
         MaximizeCommand = new RelayCommand(_ => Maximize());
-        MuteCommand = new RelayCommand(_ => IsMuted = !IsMuted);
+        MuteCommand = new RelayCommand(_ => MediaControlModel.IsMuted = !MediaControlModel.IsMuted);
         MediaOpenedCommand = new RelayCommand(MediaOpened);
         OpenPlaylistCommand =
             new RelayCommand(_ => IsPlayListOpened = !IsPlayListOpened, _ => !_isPlaylistOpenedInWindow);
@@ -262,24 +183,40 @@ public sealed class MainViewModel : BaseViewModel
         RepeatCurrentMediaCommand = new RelayCommand(_ => CurrentMedia.IsRepeat = !CurrentMedia.IsRepeat,
             _ => Playlist.MediaInfos.Any());
 
-        PlusVolumeCommand = new RelayCommand(_ => Volume += 5, _ => !IsMuted);
-        MinusVolumeCommand = new RelayCommand(_ => Volume -= 5, _ => !IsMuted);
+        PlusVolumeCommand = new RelayCommand(_ => MediaControlModel.Volume += 5, _ => !MediaControlModel.IsMuted);
+        MinusVolumeCommand = new RelayCommand(_ => MediaControlModel.Volume -= 5, _ => !MediaControlModel.IsMuted);
         OpenAboutCommand = new RelayCommand(_ => _windowService.OpenWindow<AboutWindow>(Application.Current.MainWindow));
 
         OpenPlaylistInWindowCommand = new RelayCommand(_ => OpenPlaylistInWindow());
+        ClearPlaylistCommand = new RelayCommand(_ => ClearPlaylist(), _ => Playlist.MediaInfos.Any());
+    }
+
+    private void Close(object? s)
+    {
+        if (s is not Window wnd) return;
+        
+        Aggregator.GetEvent<ClosePlaylistWindowEvent>().Unsubscribe(_closePlaylistWindowEventToken);
+        Aggregator.GetEvent<DeleteMediaEvent>().Unsubscribe(_deleteMediaEventToken);
+        Aggregator.GetEvent<RepeatMediaEvent>().Unsubscribe(_repeatMediaEventToken);
+        Aggregator.GetEvent<AddMediaFileEvent>().Unsubscribe(_addMediaFileEventToken);
+        Aggregator.GetEvent<AddFolderEvent>().Unsubscribe(_addFolderEventToken);
+        Aggregator.GetEvent<ClearPlaylistEvent>().Unsubscribe(_clearPlaylistEventToken);
+
+        MediaControlController.CloseMedia();
+        wnd.Close();
     }
 
     private void PlayPauseSwitch()
     {
-        if (IsPaused)
+        if (MediaControlModel.IsPaused)
         {
             MediaControlController.Play();
-            IsPaused = false;
+            MediaControlModel.IsPaused = false;
             return;
         }
 
         MediaControlController.Pause();
-        IsPaused = true;
+        MediaControlModel.IsPaused = true;
     }
 
     /// <summary>
@@ -299,7 +236,7 @@ public sealed class MainViewModel : BaseViewModel
         OpenMediaFileInternal(filePath);
 
         NextMediaFile();
-        IsPaused = false;
+        MediaControlModel.IsPaused = false;
     }
 
     private void OpenFolder()
@@ -321,7 +258,7 @@ public sealed class MainViewModel : BaseViewModel
         }
         
         NextMediaFile();
-        IsPaused = false;
+        MediaControlModel.IsPaused = false;
     }
 
     /// <summary>
@@ -331,7 +268,7 @@ public sealed class MainViewModel : BaseViewModel
     {
         if (Application.Current.MainWindow is not MetroWindow wnd) return;
 
-        if (!_isFullscreen)
+        if (!MediaControlModel.IsFullscreen)
         {
             _windowStateService.SaveState(wnd);
                 
@@ -340,8 +277,8 @@ public sealed class MainViewModel : BaseViewModel
             wnd.UseNoneWindowStyle = true;
             wnd.IgnoreTaskbarOnMaximize = true;
 
-            IsFullscreen = true;
-            MediaControlController.Maximize(IsFullscreen);
+            MediaControlModel.IsFullscreen = true;
+            MediaControlController.Maximize(MediaControlModel.IsFullscreen);
             return;
         }
             
@@ -350,8 +287,8 @@ public sealed class MainViewModel : BaseViewModel
         wnd.UseNoneWindowStyle = false;
         wnd.ShowTitleBar = true;
 
-        IsFullscreen = false;
-        MediaControlController.Maximize(IsFullscreen);
+        MediaControlModel.IsFullscreen = false;
+        MediaControlController.Maximize(MediaControlModel.IsFullscreen);
     }
 
     /// <summary>
@@ -371,7 +308,6 @@ public sealed class MainViewModel : BaseViewModel
         Playlist[_playedMediaIndex].IsPlaying = true;
         MediaInfo info = Playlist[_playedMediaIndex];
         MediaControlController.OpenMediaFile(info.Path + info.Title);
-        Aggregator.GetEvent<UpdatePlayedMediaIndexEvent>().Publish(_playedMediaIndex);
     }
 
     /// <summary>
@@ -390,7 +326,6 @@ public sealed class MainViewModel : BaseViewModel
         Playlist[_playedMediaIndex].IsPlaying = true;
         MediaInfo info = Playlist[_playedMediaIndex];
         MediaControlController.OpenMediaFile(info.Path + info.Title);
-        Aggregator.GetEvent<UpdatePlayedMediaIndexEvent>().Publish(_playedMediaIndex);
     }
 
     /// <summary>
@@ -402,15 +337,12 @@ public sealed class MainViewModel : BaseViewModel
         if (o is not RoutedEventArgs {Source: MediaElement me})
             return;
 
-        // TotalDuration = args.Info.Duration;
-        // Position = args.Info.StartTime;
-        // TrackTitle = $"{args.Info.MediaSource}";
         CurrentMedia = Playlist[_playedMediaIndex];
-        TotalDuration = me.NaturalDuration.TimeSpan;
-        Position = TimeSpan.Zero;
+        MediaControlModel.TotalDuration = me.NaturalDuration.TimeSpan;
+        MediaControlModel.Position = TimeSpan.Zero;
         TrackTitle = CurrentMedia.Title;
 
-        if (!IsPaused) 
+        if (!MediaControlModel.IsPaused) 
             MediaControlController.Play();
     }
     
@@ -425,7 +357,7 @@ public sealed class MainViewModel : BaseViewModel
 
         if (CurrentMedia.IsRepeat)
         {
-            Position = TimeSpan.Zero;
+            MediaControlModel.Position = TimeSpan.Zero;
             return;
         }
 
@@ -480,6 +412,18 @@ public sealed class MainViewModel : BaseViewModel
         Aggregator.GetEvent<PlaylistUpdateEvent>().Publish(Playlist);
     }
 
+    private void ClearPlaylist()
+    {
+        if (!MediaControlModel.IsPaused)
+            PlayPauseSwitch();
+
+        MediaControlController.CloseMedia();
+        MediaControlModel.Position = TimeSpan.Zero;
+        MediaControlModel.TotalDuration = TimeSpan.Zero;
+        _playedMediaIndex = -1;
+        Playlist.MediaInfos.Clear();
+    }
+
     /// <summary>
     /// Open internal media file
     /// </summary>
@@ -526,7 +470,7 @@ public sealed class MainViewModel : BaseViewModel
         if (Playlist.MediaInfos.Count > 1 || _playedMediaIndex > -1)
             return;
 
-        IsPaused = false;
+        MediaControlModel.IsPaused = false;
         NextMediaFile();
     }
     
@@ -537,11 +481,5 @@ public sealed class MainViewModel : BaseViewModel
     {
         foreach (var mediaInfo in Playlist.MediaInfos)
             Playlist.TotalDuration += mediaInfo.Duration.GetValueOrDefault();
-    }
-
-    private void NotifySliderDataChanged()
-    {
-        OnPropertyChanged(nameof(Position));
-        OnPropertyChanged(nameof(PositionSeconds));
     }
 }

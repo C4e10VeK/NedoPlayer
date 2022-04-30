@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Windows;
 using System.Windows.Input;
 using NedoPlayer.NedoEventAggregator;
 using NedoPlayer.Utils;
@@ -9,31 +10,31 @@ namespace NedoPlayer.ViewModels;
 
 public class AboutViewModel : BaseViewModel
 {
-    private string _osName;
-    public string OsName => _osName;
+    public string OsName { get; }
 
-    private string _appVersion;
-    public string AppVersion => _appVersion;
+    public string AppVersion { get; }
 
-    private string _architecture;
-    public string Architecture => _architecture;
+    public string Architecture { get; }
 
-    private string _nicknameCreator;
-    public string NicknameCreator => _nicknameCreator;
-
-    public event EventHandler? CloseRequested;
+    public string NicknameCreator { get; }
 
     public ICommand CloseCommand { get; }
     
     public AboutViewModel(IEventAggregator aggregator) : base(aggregator)
     {
         var os = Environment.OSVersion;
-        _osName = os.VersionString;
+        OsName = os.VersionString;
 
-        _appVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-        _architecture = RuntimeInformation.ProcessArchitecture.ToString("G");
-        _nicknameCreator = "Che10VeK";
+        AppVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        Architecture = RuntimeInformation.ProcessArchitecture.ToString("G");
+        NicknameCreator = "Che10VeK";
 
-        CloseCommand = new RelayCommand(_ => CloseRequested?.Invoke(this, EventArgs.Empty));
+        CloseCommand = new RelayCommand(Close);
+    }
+
+    private void Close(object? s)
+    {
+        if (s is not Window w) return;
+        w.Close();
     }
 }

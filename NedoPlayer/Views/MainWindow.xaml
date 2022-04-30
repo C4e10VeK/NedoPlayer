@@ -1,4 +1,5 @@
 ﻿<mah:MetroWindow x:Class="NedoPlayer.Views.MainWindow"
+                 x:Name="ThisMainWindow"
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -18,7 +19,7 @@
                  DataContext="{Binding MainViewModel, Source={StaticResource ViewModelLocator}}">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closed">
-            <i:InvokeCommandAction Command="{Binding CloseCommand}" PassEventArgsToCommand="False" />
+            <i:InvokeCommandAction Command="{Binding CloseCommand}" CommandParameter="{Binding ElementName=ThisMainWindow}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <mah:MetroWindow.IconTemplate>
@@ -38,21 +39,23 @@
         <TaskbarItemInfo>
             <TaskbarItemInfo.ThumbButtonInfos>
                 <ThumbButtonInfo Description="Play/Pause"
-                                 ImageSource="{Binding IsPaused, Converter={StaticResource BoolToPlayPauseImgConverter}}"
+                                 ImageSource="{Binding MediaControlModel.IsPaused, Converter={StaticResource BoolToPlayPauseImgConverter}}"
                                  Command="{Binding PlayPauseCommand}" />
             </TaskbarItemInfo.ThumbButtonInfos>
         </TaskbarItemInfo>
     </mah:MetroWindow.TaskbarItemInfo>
     <mah:MetroWindow.InputBindings>
-        <KeyBinding Gesture="CTRL+Q" Command="{Binding CloseCommand}"></KeyBinding>
+        <KeyBinding Gesture="CTRL+Q" Command="{Binding CloseCommand}" CommandParameter="{Binding ElementName=ThisMainWindow}" />
         <KeyBinding Gesture="CTRL+O" Command="{Binding OpenFileCommand}"></KeyBinding>
         <KeyBinding Gesture="CTRL+SHIFT+O" Command="{Binding OpenFolderCommand}"></KeyBinding>
         <KeyBinding Gesture="CTRL+SPACE" Command="{Binding PlayPauseCommand}"></KeyBinding>
     </mah:MetroWindow.InputBindings>
     <mah:MetroWindow.Flyouts>
         <mah:FlyoutsControl>
-            <mah:Flyout Header="{x:Static p:Resource.Playlist}" Position="Right"
+            <mah:Flyout Header="{x:Static p:Resource.Playlist}" 
+                        Position="Right"
                         Width="400"
+                        Theme="Adapt"
                         IsOpen="{Binding IsPlayListOpened}">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -63,7 +66,10 @@
                                               PlaylistSource="{Binding Playlist}"
                                               SelectedMediaIndex="{Binding SelectedMediaIndex, Mode=OneWayToSource}" 
                                               RepeatMediaCommand="{Binding RepeatMediaCommand}"
-                                              DeleteMediaCommand="{Binding DeleteMediaFromPlaylistCommand}"/>
+                                              DeleteMediaCommand="{Binding DeleteMediaFromPlaylistCommand}"
+                                              AddMediaCommand="{Binding AddFileToPlaylistCommand}"
+                                              AddFolderCommand="{Binding AddFolderToPlaylistCommand}"
+                                              ClearPlaylistCommand="{Binding ClearPlaylistCommand}" />
                     <Button Grid.Row="1"
                             Margin="25"
                             Height="25"
@@ -80,7 +86,7 @@
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <Menu Grid.Row="0" Visibility="{Binding IsFullscreen, Converter={StaticResource BoolToVisibilityConverter}}">
+        <Menu Grid.Row="0" Visibility="{Binding MediaControlModel.IsFullscreen, Converter={StaticResource BoolToVisibilityConverter}}">
             <MenuItem Header="{x:Static p:Resource.Media}">
                 <MenuItem Header="{x:Static p:Resource.OpenFile}" InputGestureText="Ctrl+O"
                           Command="{Binding OpenFileCommand}">
@@ -91,7 +97,7 @@
                 <MenuItem Header="{x:Static p:Resource.OpenFolder}" InputGestureText="Ctrl+Shift+O"
                           Command="{Binding OpenFolderCommand}">
                     <MenuItem.Icon>
-                        <iconPacks:PackIconMaterial Kind="Folder" />
+                        <iconPacks:PackIconMaterial Kind="FolderOpen" />
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Header="{x:Static p:Resource.AddFile}"
@@ -107,7 +113,10 @@
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator />
-                <MenuItem Header="{x:Static p:Resource.Exit}" Command="{Binding CloseCommand}" InputGestureText="Ctrl+Q">
+                <MenuItem Header="{x:Static p:Resource.Exit}" 
+                          InputGestureText="Ctrl+Q"
+                          Command="{Binding CloseCommand}" 
+                          CommandParameter="{Binding ElementName=ThisMainWindow}">
                     <MenuItem.Icon>
                         <iconPacks:PackIconMaterial Kind="ExitRun" />
                     </MenuItem.Icon>
@@ -118,7 +127,7 @@
                           InputGestureText="Ctrl+Space"
                           Command="{Binding PlayPauseCommand}">
                     <MenuItem.Icon>
-                        <iconPacks:PackIconMaterial Width="15" Height="15" Kind="{Binding IsPaused, Converter={StaticResource BoolToPlayPauseKindConverter}}" />
+                        <iconPacks:PackIconMaterial Width="15" Height="15" Kind="{Binding MediaControlModel.IsPaused, Converter={StaticResource BoolToPlayPauseKindConverter}}" />
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Header="{x:Static p:Resource.Stop}">
@@ -146,8 +155,8 @@
                         <iconPacks:PackIconMaterial Width="15" Height="15">
                             <iconPacks:PackIconMaterial.Kind>
                                 <MultiBinding Converter="{StaticResource VolumeToVolumeKindConverter}">
-                                    <Binding Path="Volume" />
-                                    <Binding Path="IsMuted" />
+                                    <Binding Path="MediaControlModel.Volume" />
+                                    <Binding Path="MediaControlModel.IsMuted" />
                                 </MultiBinding>
                             </iconPacks:PackIconMaterial.Kind>
                         </iconPacks:PackIconMaterial>
@@ -184,9 +193,8 @@
         </Menu>
         <MediaElement Grid.Row="1" x:Name="VideoPlayer"
                            LoadedBehavior="Manual"
-                           utils:MediaElementAttached.VideoPosition="{Binding Position, Mode=TwoWay}"
-                           Volume="{Binding VolumeToFfmpeg, Mode=TwoWay}"
-                           IsMuted="{Binding IsMuted, Mode=TwoWay}"
+                           Volume="{Binding MediaControlModel.VolumeToFfmpeg, Mode=TwoWay}"
+                           IsMuted="{Binding MediaControlModel.IsMuted, Mode=TwoWay}"
                            UnloadedBehavior="Manual">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MediaOpened">
@@ -199,12 +207,12 @@
         </MediaElement>
         <controls:VideoPlayerControl Grid.Row="2" x:Name="VideoPlayerControl"
                                      Height="60" VerticalAlignment="Bottom"
-                                     PlaybackEndTime="{Binding TotalDuration}"
-                                     Position="{Binding Position}"
-                                     PositionSecond="{Binding PositionSeconds, Mode=TwoWay}"
-                                     Volume="{Binding Volume, Mode=TwoWay}"
-                                     IsMuted="{Binding IsMuted}"
-                                     IsPaused="{Binding IsPaused, Mode=TwoWay}"
+                                     PlaybackEndTime="{Binding MediaControlModel.TotalDuration}"
+                                     Position="{Binding MediaControlModel.Position}"
+                                     PositionSecond="{Binding MediaControlModel.PositionSeconds, Mode=TwoWay}"
+                                     Volume="{Binding MediaControlModel.Volume, Mode=TwoWay}"
+                                     IsMuted="{Binding MediaControlModel.IsMuted}"
+                                     IsPaused="{Binding MediaControlModel.IsPaused, Mode=TwoWay}"
                                      IsRepeated="{Binding CurrentMedia.IsRepeat}"
                                      PlayPauseCommand="{Binding PlayPauseCommand}"
                                      MaximizeCommand="{Binding MaximizeCommand}"

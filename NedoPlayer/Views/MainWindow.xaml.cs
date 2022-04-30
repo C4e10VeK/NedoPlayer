@@ -17,13 +17,12 @@ namespace NedoPlayer.Views;
 public partial class MainWindow
 {
     private readonly DispatcherTimer _timerForHide;
-    private DispatcherTimer _timerForPos;
+    private readonly DispatcherTimer _timerForPos;
         
     public MainWindow()
     {
         InitializeComponent();
         InitMediaPlayer();
-        Closed += MainWindow_OnClosed;
         _timerForHide = new DispatcherTimer(DispatcherPriority.Input)
         {
             Interval = TimeSpan.FromSeconds(3)
@@ -46,10 +45,10 @@ public partial class MainWindow
 
     private void TimerForPosOnTick(object sender, EventArgs e)
     {
-        if (DataContext is not MainViewModel {TotalDuration.TotalSeconds: > 0} vm) return;
+        if (DataContext is not MainViewModel {MediaControlModel.TotalDuration.TotalSeconds: > 0} vm) return;
         if (!VideoPlayer.NaturalDuration.HasTimeSpan || !(VideoPlayer.NaturalDuration.TimeSpan.TotalSeconds > 0)) return;
         
-        vm.Position = VideoPlayer.Position;
+        vm.MediaControlModel.Position = VideoPlayer.Position;
     }
 
     private void OpenMediaFromArgs()
@@ -72,8 +71,6 @@ public partial class MainWindow
             
         dt.MediaControlController.PauseRequested += (_, _) => VideoPlayer.Pause();
 
-        dt.MediaControlController.CloseRequested += (_, _) => Close();
-
         dt.MediaControlController.MaximizeRequested += (_, fullscreen) =>
         {
             if (fullscreen)
@@ -94,19 +91,22 @@ public partial class MainWindow
             VideoPlayer.Source = new Uri(path);
             VideoPlayer.Play();
             if (vm is not MainViewModel viewModel) return;
-            if (viewModel.IsPaused)
+            if (viewModel.MediaControlModel.IsPaused)
                 VideoPlayer.Pause();
         };
-    }
 
-    private void MainWindow_OnClosed(object? sender, EventArgs e)
-    {
-        VideoPlayer.Close();
+        dt.MediaControlController.CloseMediaRequested += (_, _) => VideoPlayer.Close();
+
+        dt.MediaControlController.SeekRequested += (vm, position) =>
+        {
+            if (vm is not MainViewModel viewModel) return;
+            if (viewModel.MediaControlModel.TotalDuration.TotalSeconds > 0) VideoPlayer.Position = position;
+        };
     }
 
     private void MainWindow_OnMouseMove(object sender, MouseEventArgs e)
     {
-        if (DataContext is not MainViewModel {IsFullscreen: true})
+        if (DataContext is not MainViewModel {MediaControlModel.IsFullscreen: true})
         {
             Mouse.OverrideCursor = null;
             VideoPlayerControl.Visibility = Visibility.Visible;

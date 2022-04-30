@@ -4,8 +4,9 @@ using NedoPlayer.NedoEventAggregator;
 namespace NedoPlayer.Utils;
 
 class PlaylistUpdateEvent : PubSubEvent<Playlist> { }
-class UpdatePlayedMediaIndexEvent : PubSubEvent<int> { }
 class DeleteMediaEvent : PubSubEvent<int> { }
 class RepeatMediaEvent : PubSubEvent<int> { }
 class ClosePlaylistWindowEvent : PubSubEvent { }
-class CloseAllWindowEvent : PubSubEvent { }
+class AddMediaFileEvent : PubSubEvent { }
+class AddFolderEvent : PubSubEvent { }
+class ClearPlaylistEvent : PubSubEvent { }

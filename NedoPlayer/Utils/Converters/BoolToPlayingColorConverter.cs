@@ -16,8 +16,8 @@ public class BoolToPlayingColorConverter : IValueConverter
             return (Brush)ThemeManager.Current.DetectTheme(Application.Current)!.Resources["MahApps.Brushes.IdealForeground"];
 
         return v
-            ? (Brush)ThemeManager.Current.DetectTheme(Application.Current)!.Resources["MahApps.Brushes.AccentBase"]
-            : (Brush)ThemeManager.Current.DetectTheme(Application.Current)!.Resources["MahApps.Brushes.IdealForeground"];
+            ? (Brush)ThemeManager.Current.DetectTheme(Application.Current)!.Resources["MahApps.Brushes.Accent2"]
+            : (Brush)ThemeManager.Current.DetectTheme(Application.Current)!.Resources["MahApps.Brushes.Text"];
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

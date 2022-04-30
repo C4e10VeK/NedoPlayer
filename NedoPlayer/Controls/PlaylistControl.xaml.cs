@@ -57,21 +57,38 @@ public partial class PlaylistControl
         DependencyProperty.Register(nameof(DeleteMediaCommand), typeof(ICommand), typeof(PlaylistControl),
             new UIPropertyMetadata(null));
 
+    public ICommand ClearPlaylistCommand
+    {
+        get => (ICommand)GetValue(ClearPlaylistCommandProperty);
+        set => SetValue(ClearPlaylistCommandProperty, value);
+    }
+
+    public static readonly DependencyProperty ClearPlaylistCommandProperty =
+        DependencyProperty.Register(nameof(ClearPlaylistCommand), typeof(ICommand), typeof(PlaylistControl),
+            new UIPropertyMetadata(null));
+
+    public ICommand AddMediaCommand
+    {
+        get => (ICommand)GetValue(AddMediaCommandProperty);
+        set => SetValue(AddMediaCommandProperty, value);
+    }
+
+    public static readonly DependencyProperty AddMediaCommandProperty =
+        DependencyProperty.Register(nameof(AddMediaCommand), typeof(ICommand), typeof(PlaylistControl),
+            new UIPropertyMetadata(null));
+
+    public ICommand AddFolderCommand
+    {
+        get => (ICommand)GetValue(AddFolderCommandProperty);
+        set => SetValue(AddFolderCommandProperty, value);
+    }
+
+    public static readonly DependencyProperty AddFolderCommandProperty =
+        DependencyProperty.Register(nameof(AddFolderCommand), typeof(ICommand), typeof(PlaylistControl),
+            new UIPropertyMetadata(null));
+
     public PlaylistControl()
     {
         InitializeComponent();
-    }
-
-    private void FrameworkElement_OnSizeChanged(object sender, SizeChangedEventArgs e)
-    {
-        if (sender is not ListView {View: GridView gridView} listView)
-            return;
-
-        var workWidth = listView.ActualWidth - SystemParameters.VerticalScrollBarWidth;
-        var col1 = 0.6;
-        var col2 = 0.45;
-
-        gridView.Columns[0].Width = workWidth * col1;
-        gridView.Columns[1].Width = workWidth * col2;
     }
 }
