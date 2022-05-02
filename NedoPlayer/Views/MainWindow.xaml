@@ -80,6 +80,92 @@
             </mah:Flyout>
         </mah:FlyoutsControl>
     </mah:MetroWindow.Flyouts>
+    <mah:MetroWindow.ContextMenu>
+        <ContextMenu>
+            <MenuItem Header="{x:Static p:Resource.Player}">
+                <MenuItem Header="{x:Static p:Resource.PlayPause}"
+                          InputGestureText="Ctrl+Space"
+                          Command="{Binding PlayPauseCommand}">
+                    <MenuItem.Icon>
+                        <iconPacks:PackIconMaterial Width="15" Height="15" Kind="{Binding MediaControlModel.IsPaused, Converter={StaticResource BoolToPlayPauseKindConverter}}" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{x:Static p:Resource.NextMedia}"
+                          Command="{Binding NextMediaCommand}">
+                    <MenuItem.Icon>
+                        <iconPacks:PackIconMaterial Width="15" Height="15" Kind="FastForward" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{x:Static p:Resource.PrevMedia}"
+                          Command="{Binding PreviousMediaCommand}">
+                    <MenuItem.Icon>
+                        <iconPacks:PackIconMaterial Width="15" Height="15" Kind="Rewind" />
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="{x:Static p:Resource.Audio}">
+                <MenuItem Header="{x:Static p:Resource.Mute}" Command="{Binding MuteCommand}">
+                    <MenuItem.Icon>
+                        <iconPacks:PackIconMaterial Width="15" Height="15">
+                            <iconPacks:PackIconMaterial.Kind>
+                                <MultiBinding Converter="{StaticResource VolumeToVolumeKindConverter}">
+                                    <Binding Path="MediaControlModel.Volume" />
+                                    <Binding Path="MediaControlModel.IsMuted" />
+                                </MultiBinding>
+                            </iconPacks:PackIconMaterial.Kind>
+                        </iconPacks:PackIconMaterial>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{x:Static p:Resource.VolumePlus}"
+                          Command="{Binding PlusVolumeCommand}">
+                    <MenuItem.Icon>
+                        <iconPacks:PackIconMaterial Width="15" Height="15" Kind="VolumePlus" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{x:Static p:Resource.VolumeMinus}"
+                          Command="{Binding MinusVolumeCommand}">
+                    <MenuItem.Icon>
+                        <iconPacks:PackIconMaterial Width="15" Height="15" Kind="VolumeMinus" />
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="{x:Static p:Resource.Playlist}">
+                <MenuItem Header="{x:Static p:Resource.AddFile}"
+                          Command="{Binding AddFileToPlaylistCommand}">
+                    <MenuItem.Icon>
+                        <iconPacks:PackIconMaterial Kind="PlaylistPlus" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{x:Static p:Resource.AddFolder}"
+                          Command="{Binding AddFolderToPlaylistCommand}">
+                    <MenuItem.Icon>
+                        <iconPacks:PackIconMaterial Kind="FolderPlus" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{x:Static p:Resource.Clear}"
+                          Command="{Binding ClearPlaylistCommand}">
+                    <MenuItem.Icon>
+                        <iconPacks:PackIconMaterial Kind="Delete" />
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="{x:Static p:Resource.Repeat}"
+                      Command="{Binding RepeatCurrentMediaCommand}">
+                <MenuItem.Icon>
+                    <iconPacks:PackIconMaterial Kind="{Binding CurrentMedia.IsRepeat, Converter={StaticResource BoolToRepeatIconConverter}}" />
+                </MenuItem.Icon>
+            </MenuItem>
+            <Separator />
+            <MenuItem Header="{x:Static p:Resource.Exit}" 
+                      InputGestureText="Ctrl+Q"
+                      Command="{Binding CloseCommand}" 
+                      CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}, Path=PlacementTarget}">
+                <MenuItem.Icon>
+                    <iconPacks:PackIconMaterial Kind="ExitRun" />
+                </MenuItem.Icon>
+            </MenuItem>
+        </ContextMenu>
+    </mah:MetroWindow.ContextMenu>
     <Grid Background="Black">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -130,11 +216,6 @@
                         <iconPacks:PackIconMaterial Width="15" Height="15" Kind="{Binding MediaControlModel.IsPaused, Converter={StaticResource BoolToPlayPauseKindConverter}}" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="{x:Static p:Resource.Stop}">
-                    <MenuItem.Icon>
-                        <iconPacks:PackIconMaterial Width="15" Height="15" Kind="Stop" />
-                    </MenuItem.Icon>
-                </MenuItem>
                 <MenuItem Header="{x:Static p:Resource.NextMedia}"
                           Command="{Binding NextMediaCommand}">
                     <MenuItem.Icon>
@@ -147,7 +228,6 @@
                         <iconPacks:PackIconMaterial Width="15" Height="15" Kind="Rewind" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <Separator/>
             </MenuItem>
             <MenuItem Header="{x:Static p:Resource.Audio}">
                 <MenuItem Header="{x:Static p:Resource.Mute}" Command="{Binding MuteCommand}">
@@ -174,10 +254,10 @@
                         <iconPacks:PackIconMaterial Width="15" Height="15" Kind="VolumeMinus" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <Separator/>
             </MenuItem>
             <MenuItem Header="{x:Static p:Resource.Help}">
-                <MenuItem Header="{x:Static p:Resource.Help}">
+                <MenuItem Header="{x:Static p:Resource.Help}"
+                          Command="{Binding ShowHelpCommand}">
                     <MenuItem.Icon>
                         <iconPacks:PackIconMaterial Width="15" Height="15" Kind="Help" />
                     </MenuItem.Icon>

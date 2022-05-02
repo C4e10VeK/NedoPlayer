@@ -160,7 +160,7 @@
     <value>Total duration</value>
   </data>
   <data name="MediaFileFilter" xml:space="preserve">
-    <value>mp4 files (*.mp4)|*.mp4|mkv files (*.mkv)|*.mkv|flv files (*.flv)|*.flv|webm files (*.webm)|*.webm|mp3 files (*.mp3)|*.mp3|All files (*.*)|*.*</value>
+    <value>Video files (*.mp4,*.mkv,*.flv,*.webm)|*.mp4;*.mkv;*.flv;*.webm|Audio files (*.mp3,*.wav,*.ogg,*.oga,*.mogg,*.webm)|*.mp3;*.wav;*.ogg;*.oga;*.mogg;*.webm|All files (*.*)|*.*</value>
   </data>
   <data name="Playlist" xml:space="preserve">
     <value>Playlist</value>
@@ -201,7 +201,7 @@
   <data name="MediaDown" xml:space="preserve">
     <value>Down</value>
   </data>
-  <data name="Clean" xml:space="preserve">
+  <data name="Clear" xml:space="preserve">
     <value>Clean</value>
   </data>
 </root>

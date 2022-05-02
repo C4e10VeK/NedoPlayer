@@ -12,6 +12,8 @@
                  xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
                  mc:Ignorable="d"
                  ResizeMode="NoResize"
+                 ShowMinButton="False"
+                 ShowMaxRestoreButton="False"
                  Title="{x:Static p:Resource.Playlist}" Height="600" Width="400"
                  DataContext="{Binding PlaylistViewModel, Source={StaticResource ViewModelLocator}}">
     <b:Interaction.Triggers>

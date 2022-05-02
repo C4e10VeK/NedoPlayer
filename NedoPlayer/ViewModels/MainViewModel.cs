@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Input;
 using MahApps.Metro.Controls;
 using Microsoft.WindowsAPICodePack.Shell;
@@ -16,6 +17,8 @@ using NedoPlayer.NedoEventAggregator;
 using NedoPlayer.Services;
 using NedoPlayer.Utils;
 using NedoPlayer.Views;
+using Application = System.Windows.Application;
+
 #pragma warning disable CS8618
 
 namespace NedoPlayer.ViewModels;
@@ -113,6 +116,7 @@ public sealed class MainViewModel : BaseViewModel
     public ICommand OpenAboutCommand { get; private set; }
     public ICommand OpenPlaylistInWindowCommand { get; private set; }
     public ICommand ClearPlaylistCommand { get; private set; }
+    public ICommand ShowHelpCommand { get; private set; }
 
     private readonly IOService _fileDialogService;
     private readonly IStateService _windowStateService;
@@ -185,10 +189,13 @@ public sealed class MainViewModel : BaseViewModel
 
         PlusVolumeCommand = new RelayCommand(_ => MediaControlModel.Volume += 5, _ => !MediaControlModel.IsMuted);
         MinusVolumeCommand = new RelayCommand(_ => MediaControlModel.Volume -= 5, _ => !MediaControlModel.IsMuted);
-        OpenAboutCommand = new RelayCommand(_ => _windowService.OpenWindow<AboutWindow>(Application.Current.MainWindow));
+        OpenAboutCommand = new RelayCommand(_ => _windowService.OpenDialogWindow<AboutWindow>(Application.Current.MainWindow));
 
         OpenPlaylistInWindowCommand = new RelayCommand(_ => OpenPlaylistInWindow());
         ClearPlaylistCommand = new RelayCommand(_ => ClearPlaylist(), _ => Playlist.MediaInfos.Any());
+
+        ShowHelpCommand = new RelayCommand(_ =>
+            Help.ShowHelp(null, @"./Resources/NedoPlayerHelp.chm"));
     }
 
     private void Close(object? s)
@@ -357,7 +364,7 @@ public sealed class MainViewModel : BaseViewModel
 
         if (CurrentMedia.IsRepeat)
         {
-            MediaControlModel.Position = TimeSpan.Zero;
+            MediaControlModel.PositionSeconds = 0;
             return;
         }
 
@@ -422,6 +429,7 @@ public sealed class MainViewModel : BaseViewModel
         MediaControlModel.TotalDuration = TimeSpan.Zero;
         _playedMediaIndex = -1;
         Playlist.MediaInfos.Clear();
+        TrackTitle = "";
     }
 
     /// <summary>

@@ -9,7 +9,7 @@
 - [X] Add playlist
 - [X] Add base command for binding
 - [X] Add base menu
-- [ ] Add popup menu
+- [X] Add popup menu
 - [X] Add repeat track
 
 ### In future:

@@ -184,10 +184,10 @@
     <value>Повторить вкл/выкл</value>
   </data>
   <data name="VolumeMinus" xml:space="preserve">
-    <value>Громкость +</value>
+    <value>Громкость -</value>
   </data>
   <data name="VolumePlus" xml:space="preserve">
-    <value>Громкость -</value>
+    <value>Громкость +</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Удалить</value>
@@ -198,7 +198,7 @@
   <data name="MediaUp" xml:space="preserve">
     <value>Верх</value>
   </data>
-  <data name="Clean" xml:space="preserve">
+  <data name="Clear" xml:space="preserve">
     <value>Очистить</value>
   </data>
 </root>

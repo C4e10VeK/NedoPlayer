@@ -97,16 +97,6 @@
         </Style>
         
         <ContextMenu x:Key="PlaylistMenu">
-            <MenuItem Header="{x:Static p:Resource.MediaUp}">
-                <MenuItem.Icon>
-                    <iconPacks:PackIconMaterial Kind="ArrowUp"></iconPacks:PackIconMaterial>
-                </MenuItem.Icon>
-            </MenuItem>
-            <MenuItem Header="{x:Static p:Resource.MediaDown}">
-                <MenuItem.Icon>
-                    <iconPacks:PackIconMaterial Kind="ArrowDown"></iconPacks:PackIconMaterial>
-                </MenuItem.Icon>
-            </MenuItem>
             <MenuItem Header="{x:Static p:Resource.Repeat}"
                       Command="{Binding RepeatMediaCommand, Source={x:Reference ThisPlaylistControl}}">
                 <MenuItem.Icon>
@@ -131,7 +121,7 @@
                     <iconPacks:PackIconMaterial Kind="FileRemove"></iconPacks:PackIconMaterial>
                 </MenuItem.Icon>
             </MenuItem>
-            <MenuItem Header="{x:Static p:Resource.Clean}"
+            <MenuItem Header="{x:Static p:Resource.Clear}"
                       Command="{Binding ClearPlaylistCommand, Source={x:Reference ThisPlaylistControl}}">
                 <MenuItem.Icon>
                     <iconPacks:PackIconMaterial Kind="Delete"></iconPacks:PackIconMaterial>
