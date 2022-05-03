@@ -117,6 +117,7 @@ public sealed class MainViewModel : BaseViewModel
     public ICommand OpenPlaylistInWindowCommand { get; private set; }
     public ICommand ClearPlaylistCommand { get; private set; }
     public ICommand ShowHelpCommand { get; private set; }
+    public ICommand PlaySelectedCommand { get; private set; }
 
     private readonly IOService _fileDialogService;
     private readonly IStateService _windowStateService;
@@ -130,6 +131,7 @@ public sealed class MainViewModel : BaseViewModel
     private readonly SubscriptionToken _addMediaFileEventToken;
     private readonly SubscriptionToken _addFolderEventToken;
     private readonly SubscriptionToken _clearPlaylistEventToken;
+    private readonly SubscriptionToken _playSelectedEventToken;
 
     public MainViewModel(IEventAggregator aggregator, IOService fileService, IStateService windowStateService,
         IWindowService windowService, IConfigFileService configFileService) : base(aggregator)
@@ -155,6 +157,7 @@ public sealed class MainViewModel : BaseViewModel
         _addMediaFileEventToken = Aggregator.GetEvent<AddMediaFileEvent>().Subscribe(AddFileToPlaylist);
         _addFolderEventToken = Aggregator.GetEvent<AddFolderEvent>().Subscribe(AddFolderToPlaylist);
         _clearPlaylistEventToken = Aggregator.GetEvent<ClearPlaylistEvent>().Subscribe(ClearPlaylist);
+        _playSelectedEventToken = Aggregator.GetEvent<PlaySelectedEvent>().Subscribe(PlaySelected);
 
         InitCommands();
     }
@@ -196,6 +199,12 @@ public sealed class MainViewModel : BaseViewModel
 
         ShowHelpCommand = new RelayCommand(_ =>
             Help.ShowHelp(null, @"./Resources/NedoPlayerHelp.chm"));
+
+        PlaySelectedCommand = new RelayCommand(o =>
+        {
+            if (o is not MouseButtonEventArgs) return;
+            PlaySelected(SelectedMediaIndex);
+        }, _ => Playlist.MediaInfos.Any());
     }
 
     private void Close(object? s)
@@ -208,6 +217,7 @@ public sealed class MainViewModel : BaseViewModel
         Aggregator.GetEvent<AddMediaFileEvent>().Unsubscribe(_addMediaFileEventToken);
         Aggregator.GetEvent<AddFolderEvent>().Unsubscribe(_addFolderEventToken);
         Aggregator.GetEvent<ClearPlaylistEvent>().Unsubscribe(_clearPlaylistEventToken);
+        Aggregator.GetEvent<PlaySelectedEvent>().Unsubscribe(_playSelectedEventToken);
 
         MediaControlController.CloseMedia();
         wnd.Close();
@@ -430,6 +440,21 @@ public sealed class MainViewModel : BaseViewModel
         _playedMediaIndex = -1;
         Playlist.MediaInfos.Clear();
         TrackTitle = "";
+    }
+
+    private void PlaySelected(int selectedIndex)
+    {
+        if (selectedIndex < 0 || selectedIndex >= Playlist.MediaInfos.Count ||
+            selectedIndex == _playedMediaIndex) return;
+        
+        Playlist[_playedMediaIndex].IsPlaying = false;
+        Playlist[_playedMediaIndex].IsRepeat = false;
+
+        _playedMediaIndex = selectedIndex;
+
+        Playlist[_playedMediaIndex].IsPlaying = true;
+        MediaInfo info = Playlist[_playedMediaIndex];
+        MediaControlController.OpenMediaFile(info.Path + info.Title);
     }
 
     /// <summary>

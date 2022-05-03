@@ -41,13 +41,13 @@
                    Margin="10"
                    Width="100" Height="100"></Image>
             <TextBlock Grid.Row="1"
-                       Foreground="{DynamicResource MahApps.Brushes.IdealForeground}"
+                       Style="{DynamicResource MahApps.Styles.TextBlock}"
                        Margin="0 10"
                        VerticalAlignment="Center" HorizontalAlignment="Center"
                        Text="NedoPlayer" 
                        FontWeight="Bold" FontSize="25" />
             <TextBlock Grid.Row="2"
-                       Foreground="{DynamicResource MahApps.Brushes.IdealForeground}"
+                       Style="{DynamicResource MahApps.Styles.TextBlock}"
                        VerticalAlignment="Center" HorizontalAlignment="Center">
                 <TextBlock.Text>
                     <MultiBinding StringFormat="{}{0}: {1}">
@@ -57,7 +57,7 @@
                 </TextBlock.Text>
             </TextBlock>
             <TextBlock Grid.Row="3"
-                       Foreground="{DynamicResource MahApps.Brushes.IdealForeground}"
+                       Style="{DynamicResource MahApps.Styles.TextBlock}"
                        VerticalAlignment="Center" HorizontalAlignment="Center">
                 <TextBlock.Text>
                     <MultiBinding StringFormat="{}{0}: {1}">
@@ -67,7 +67,7 @@
                 </TextBlock.Text>
             </TextBlock>
             <TextBlock Grid.Row="4"
-                       Foreground="{DynamicResource MahApps.Brushes.IdealForeground}"
+                       Style="{DynamicResource MahApps.Styles.TextBlock}"
                        VerticalAlignment="Center" HorizontalAlignment="Center">
                 <TextBlock.Text>
                     <MultiBinding StringFormat="{}{0}: {1}">
@@ -77,7 +77,7 @@
                 </TextBlock.Text>
             </TextBlock>
             <TextBlock Grid.Row="5"
-                       Foreground="{DynamicResource MahApps.Brushes.IdealForeground}"
+                       Style="{DynamicResource MahApps.Styles.TextBlock}"
                        VerticalAlignment="Center" HorizontalAlignment="Center">
                 <TextBlock.Text>
                     <MultiBinding StringFormat="{}{0}: {1}">
@@ -89,7 +89,7 @@
         </Grid>
         <Button Grid.Row="1"
                 IsCancel="True"
-                Style="{StaticResource MahApps.Styles.Button}"
+                Style="{DynamicResource MahApps.Styles.Button}"
                 Margin="10"
                 Width="75" Height="25" 
                 VerticalAlignment="Bottom" HorizontalAlignment="Center"

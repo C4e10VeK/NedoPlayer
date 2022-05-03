@@ -6,13 +6,13 @@
         <UseWPF>true</UseWPF>
         <ApplicationIcon>Resources\img\favicon.ico</ApplicationIcon>
         <LangVersion>10</LangVersion>
-        <AssemblyVersion>1.0.0</AssemblyVersion>
-        <Version>1.0.0</Version>
+        <AssemblyVersion>1.0.1</AssemblyVersion>
+        <Version>1.0.1</Version>
         <NeutralLanguage>en-US</NeutralLanguage>
         <PlatformTarget>x64</PlatformTarget>
-        <TargetFramework>net48</TargetFramework>
         <Company>Che10VeK</Company>
         <PublicSign>false</PublicSign>
+        <TargetFramework>net48</TargetFramework>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0-windows|AnyCPU'">
@@ -74,9 +74,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="ffme.win">
-        <HintPath>..\..\..\.nuget\packages\ffme.windows\4.2.330\lib\net472\ffme.win.dll</HintPath>
-      </Reference>
+      <Reference Include="System.Runtime.Caching" />
+      <Reference Include="System.Runtime.DurableInstancing" />
       <Reference Include="System.Windows.Forms" />
     </ItemGroup>
 

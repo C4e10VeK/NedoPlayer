@@ -10,3 +10,4 @@ class ClosePlaylistWindowEvent : PubSubEvent { }
 class AddMediaFileEvent : PubSubEvent { }
 class AddFolderEvent : PubSubEvent { }
 class ClearPlaylistEvent : PubSubEvent { }
+class PlaySelectedEvent : PubSubEvent<int> { }

@@ -86,6 +86,16 @@ public partial class PlaylistControl
     public static readonly DependencyProperty AddFolderCommandProperty =
         DependencyProperty.Register(nameof(AddFolderCommand), typeof(ICommand), typeof(PlaylistControl),
             new UIPropertyMetadata(null));
+    
+    public ICommand PlaySelectedCommand
+    {
+        get => (ICommand)GetValue(PlaySelectedCommandProperty);
+        set => SetValue(PlaySelectedCommandProperty, value);
+    }
+
+    public static readonly DependencyProperty PlaySelectedCommandProperty =
+        DependencyProperty.Register(nameof(PlaySelectedCommand), typeof(ICommand), typeof(PlaylistControl),
+            new UIPropertyMetadata(null));
 
     public PlaylistControl()
     {

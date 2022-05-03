@@ -38,6 +38,7 @@ public class PlaylistViewModel : BaseViewModel
     public ICommand AddMediaCommand { get; }
     public ICommand AddFolderCommand { get; }
     public ICommand ClearPlaylistCommand { get; }
+    public ICommand PlaySelectedCommand { get; }
 
     private readonly SubscriptionToken _playlistUpdateEventToken;
 
@@ -63,6 +64,13 @@ public class PlaylistViewModel : BaseViewModel
             _ => Aggregator.GetEvent<ClearPlaylistEvent>().Publish(),
             _ => Playlist.MediaInfos.Any()
         );
+
+        PlaySelectedCommand = new RelayCommand(o =>
+        {
+            if (o is not MouseButtonEventArgs) return;
+            Aggregator.GetEvent<PlaySelectedEvent>().Publish(SelectedMediaIndex);
+        },
+            _ => Playlist.MediaInfos.Any());
     }
 
     private void Close(object? obj)

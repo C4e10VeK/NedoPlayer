@@ -104,10 +104,10 @@
         </Style.Triggers>
     </Style>
     </UserControl.Resources>
-    <Grid>
+    <Grid Background="{DynamicResource MahApps.Brushes.Control.Background}">
         <Grid VerticalAlignment="Bottom"
               Height="60"
-              Background="{StaticResource MahApps.Brushes.Control.Background}">
+              Background="{DynamicResource MahApps.Brushes.Control.Background}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
