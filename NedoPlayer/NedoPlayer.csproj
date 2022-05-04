@@ -4,6 +4,7 @@
         <OutputType>WinExe</OutputType>
         <Nullable>enable</Nullable>
         <UseWPF>true</UseWPF>
+        <UseWindowsForms>true</UseWindowsForms>
         <ApplicationIcon>Resources\img\favicon.ico</ApplicationIcon>
         <LangVersion>10</LangVersion>
         <AssemblyVersion>1.0.1</AssemblyVersion>
@@ -26,7 +27,7 @@
     <ItemGroup>
       <PackageReference Include="MahApps.Metro" Version="2.4.9" />
       <PackageReference Include="MahApps.Metro.IconPacks" Version="4.11.0" />
-      <PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
+      <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.4" />
     </ItemGroup>
 
     <ItemGroup>
@@ -71,12 +72,6 @@
         <AutoGen>True</AutoGen>
         <DependentUpon>Resource.resx</DependentUpon>
       </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="System.Runtime.Caching" />
-      <Reference Include="System.Runtime.DurableInstancing" />
-      <Reference Include="System.Windows.Forms" />
     </ItemGroup>
 
 </Project>

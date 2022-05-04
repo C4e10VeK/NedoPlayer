@@ -118,6 +118,7 @@ public sealed class MainViewModel : BaseViewModel
     public ICommand ClearPlaylistCommand { get; private set; }
     public ICommand ShowHelpCommand { get; private set; }
     public ICommand PlaySelectedCommand { get; private set; }
+    public ICommand OpenFileInfoCommand { get; private set; }
 
     private readonly IOService _fileDialogService;
     private readonly IStateService _windowStateService;
@@ -204,6 +205,12 @@ public sealed class MainViewModel : BaseViewModel
         {
             if (o is not MouseButtonEventArgs) return;
             PlaySelected(SelectedMediaIndex);
+        }, _ => Playlist.MediaInfos.Any());
+
+        OpenFileInfoCommand = new RelayCommand(_ =>
+        {
+            var filePath = $"{CurrentMedia.Path}{CurrentMedia.Title}";
+            FilePropertiesWindow.Show(filePath);
         }, _ => Playlist.MediaInfos.Any());
     }
 
@@ -468,9 +475,9 @@ public sealed class MainViewModel : BaseViewModel
 
         // Sorting medias by group
         var tempMediaList = Playlist.MediaInfos.OrderBy(x => x).ToList();
-        Debug.Assert(Playlist != null, "Playlist != null");
+        Debug.Assert(tempMediaList != null, "tempMediaList != null");
         // get group medias by path
-        List<MediaInfo> groupList = Playlist!.MediaInfos.Where(x => x.Path == filePath.Replace(title, "")).ToList();
+        List<MediaInfo> groupList = Playlist.MediaInfos.Where(x => x.Path == filePath.Replace(title, "")).ToList();
         
         // set group id for new media
         int groupId = tempMediaList.Count == 0 ?
