@@ -1,6 +1,6 @@
 # NedoPlayer media-player in C# WPF
 
-### Simple C# media-player with FFMPEG
+### Simple C# media-player
 
 ## TODO
 
