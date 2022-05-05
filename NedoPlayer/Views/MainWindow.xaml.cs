@@ -55,7 +55,8 @@ public partial class MainWindow
     {
         if (App.Args == null || !File.Exists(App.Args[0]) || DataContext is not MainViewModel dt) return;
         dt.OpenMediaFileInternal(App.Args[0]);
-        dt.MediaControlController.OpenMediaFile(App.Args[0]);
+        dt.NextMediaCommand.Execute(null);
+        dt.MediaControlModel.IsPaused = false;
     }
 
     private void InitMediaPlayer()
