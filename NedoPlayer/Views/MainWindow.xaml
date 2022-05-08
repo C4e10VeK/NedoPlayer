@@ -301,6 +301,8 @@
                                      OpenPlaylistCommand="{Binding OpenPlaylistCommand}" 
                                      NextMediaCommand="{Binding NextMediaCommand}"
                                      PrevMediaCommand="{Binding PreviousMediaCommand}"
-                                     RepeatCommand="{Binding RepeatCurrentMediaCommand}"/>
+                                     RepeatCommand="{Binding RepeatCurrentMediaCommand}"
+                                     PlayCommand="{Binding PlayCommand}"
+                                     PauseCommand="{Binding PauseCommand}"/>
     </Grid>
 </mah:MetroWindow>

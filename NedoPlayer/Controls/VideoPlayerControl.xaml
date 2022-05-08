@@ -126,7 +126,10 @@
                                        Minimum="0" Maximum="{Binding PlaybackEndTime.TotalSeconds, ElementName=This}"
                                        AutoToolTipPlacement="TopLeft"
                                        AutoToolTipFormat="{}{0:hh\:mm\:ss}"
-                                       Value="{Binding PositionSecond, ElementName=This, Mode=TwoWay}" />
+                                       Value="{Binding PositionSecond, ElementName=This, Mode=TwoWay}"
+                                       PlayCommand="{Binding PlayCommand, ElementName=This}"
+                                       PauseCommand="{Binding PauseCommand, ElementName=This}"
+                                       IsPaused="{Binding IsPaused, ElementName=This}"/>
             <StackPanel Grid.Row="0" Grid.Column="3"
                         Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"
                         Margin="5 0">
@@ -155,10 +158,6 @@
                                                 Width="20" Height="20"
                                                 VerticalAlignment="Center" HorizontalAlignment="Center"
                                                 Kind="{Binding IsPaused, ElementName=This, Converter={StaticResource BoolToPlayPauseKindConverter}}" />
-                    <!-- <Image Width="20" Margin="1 0 0 0" -->
-                           <!-- VerticalAlignment="Center" HorizontalAlignment="Center" -->
-                           <!-- RenderOptions.BitmapScalingMode="HighQuality" -->
-                           <!-- Source="{Binding IsPaused, ElementName=This, Converter={StaticResource BoolToPlayPauseImgConverter}}" /> -->
                 </Button>
                 <Button Width="35" Height="35" Margin="5 0" ToolTip="{x:Static p:Resource.NextMedia}"
                         Style="{DynamicResource MahApps.Styles.Button.Circle}"
