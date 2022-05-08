@@ -266,9 +266,9 @@ public sealed class MainViewModel : BaseViewModel
             Playlist.MediaInfos.Clear();
             _playedMediaIndex = -1;
         }
-        
-        var allowedExt = new[] {"mp3", "mp4", "webm", "mkv", "flv", "avi", "amv"};
-        
+
+        string[] allowedExt = {"mp3", "mp4", "webm", "mkv", "flv", "wav", "ogg", "oga", "mogg"};
+
         foreach (var f in Directory.GetFiles(folder).Where(f => allowedExt.Any(f.ToLower().EndsWith)))
         {
             OpenMediaFileInternal(f);
