@@ -8,6 +8,7 @@
                  xmlns:p="clr-namespace:NedoPlayer.Resources"
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                  xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+                 xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
                  mc:Ignorable="d"
                  ResizeMode="NoResize"
                  ShowMinButton="False"
@@ -44,7 +45,7 @@
                        Style="{DynamicResource MahApps.Styles.TextBlock}"
                        Margin="0 10"
                        VerticalAlignment="Center" HorizontalAlignment="Center"
-                       Text="NedoPlayer" 
+                       Text="{x:Static p:Resource.AppName}"
                        FontWeight="Bold" FontSize="25" />
             <TextBlock Grid.Row="2"
                        Style="{DynamicResource MahApps.Styles.TextBlock}"
@@ -79,12 +80,22 @@
             <TextBlock Grid.Row="5"
                        Style="{DynamicResource MahApps.Styles.TextBlock}"
                        VerticalAlignment="Center" HorizontalAlignment="Center">
-                <TextBlock.Text>
-                    <MultiBinding StringFormat="{}{0}: {1}">
-                        <Binding Source="{x:Static p:Resource.Creator}" />
-                        <Binding Path="NicknameCreator" />
-                    </MultiBinding>
-                </TextBlock.Text>
+                <Hyperlink Style="{DynamicResource MahApps.Styles.Hyperlink}"
+                           NavigateUri="https://t.me/che10vek_x">
+                    <b:Interaction.Triggers>
+                        <b:EventTrigger EventName="RequestNavigate">
+                            <b:InvokeCommandAction Command="{Binding OpenLinkCommand}" PassEventArgsToCommand="True" />
+                        </b:EventTrigger>
+                    </b:Interaction.Triggers>
+                    <TextBlock>
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}{0}: {1}">
+                                <Binding Source="{x:Static p:Resource.Creator}" />
+                                <Binding Path="NicknameCreator" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </Hyperlink>
             </TextBlock>
         </Grid>
         <Button Grid.Row="1"

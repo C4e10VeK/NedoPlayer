@@ -201,4 +201,7 @@
   <data name="Clear" xml:space="preserve">
     <value>Очистить</value>
   </data>
+  <data name="AppName" xml:space="preserve">
+    <value>Медиаплеер</value>
+  </data>
 </root>

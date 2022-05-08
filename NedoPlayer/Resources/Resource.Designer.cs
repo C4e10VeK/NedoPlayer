@@ -88,6 +88,15 @@ namespace NedoPlayer.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to NedoPlayer.
+        /// </summary>
+        public static string AppName {
+            get {
+                return ResourceManager.GetString("AppName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to App version.
         /// </summary>
         public static string AppVersion {
@@ -178,7 +187,7 @@ namespace NedoPlayer.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to mp4 files (*.mp4)|*.mp4|mkv files (*.mkv)|*.mkv|flv files (*.flv)|*.flv|webm files (*.webm)|*.webm|mp3 files (*.mp3)|*.mp3|All files (*.*)|*.*.
+        ///   Looks up a localized string similar to Video files (*.mp4,*.mkv,*.flv,*.webm)|*.mp4;*.mkv;*.flv;*.webm|Audio files (*.mp3,*.wav,*.ogg,*.oga,*.mogg,*.webm)|*.mp3;*.wav;*.ogg;*.oga;*.mogg;*.webm|All files (*.*)|*.*.
         /// </summary>
         public static string MediaFileFilter {
             get {

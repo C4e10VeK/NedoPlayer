@@ -142,6 +142,26 @@ public partial class VideoPlayerControl
     public static readonly DependencyProperty RepeatCommandProperty =
         DependencyProperty.Register(nameof(RepeatCommand), typeof(ICommand), typeof(VideoPlayerControl),
             new UIPropertyMetadata(null));
+    
+    public ICommand PlayCommand
+    {
+        get => (ICommand) GetValue(PlayCommandProperty);
+        set => SetValue(PlayCommandProperty, value);
+    }
+
+    public static readonly DependencyProperty PlayCommandProperty =
+        DependencyProperty.Register(nameof(PlayCommand), typeof(ICommand), typeof(VideoPlayerControl),
+            new UIPropertyMetadata(null));
+    
+    public ICommand PauseCommand
+    {
+        get => (ICommand) GetValue(PauseCommandProperty);
+        set => SetValue(PauseCommandProperty, value);
+    }
+
+    public static readonly DependencyProperty PauseCommandProperty =
+        DependencyProperty.Register(nameof(PauseCommand), typeof(ICommand), typeof(VideoPlayerControl),
+            new UIPropertyMetadata(null));
 
     public VideoPlayerControl()
     {
