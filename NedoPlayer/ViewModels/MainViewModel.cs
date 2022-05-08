@@ -447,6 +447,7 @@ public sealed class MainViewModel : BaseViewModel
         _playedMediaIndex = -1;
         Playlist.MediaInfos.Clear();
         TrackTitle = "";
+        Playlist.TotalDuration = TimeSpan.Zero;
     }
 
     private void PlaySelected(int selectedIndex)
@@ -519,7 +520,8 @@ public sealed class MainViewModel : BaseViewModel
     /// </summary>
     private void CountPlaylistDuration()
     {
+        Playlist.TotalDuration = TimeSpan.Zero;
         foreach (var mediaInfo in Playlist.MediaInfos)
-            Playlist.TotalDuration += mediaInfo.Duration.GetValueOrDefault();
+            Playlist.TotalDuration += mediaInfo.Duration.GetValueOrDefault(TimeSpan.Zero);
     }
 }
