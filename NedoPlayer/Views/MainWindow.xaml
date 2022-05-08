@@ -13,7 +13,7 @@
                  xmlns:utils="clr-namespace:NedoPlayer.Utils"
                  mc:Ignorable="d" 
                  ResizeMode="CanResizeWithGrip"
-                 Title="NedoPlayer" Height="600" Width="800" MinHeight="500" MinWidth="700"
+                 Title="{x:Static p:Resource.AppName}" Height="600" Width="800" MinHeight="500" MinWidth="700"
                  BorderThickness="0"
                  MouseMove="MainWindow_OnMouseMove"
                  DataContext="{Binding MainViewModel, Source={StaticResource ViewModelLocator}}">
