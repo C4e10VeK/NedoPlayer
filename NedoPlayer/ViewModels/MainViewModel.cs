@@ -427,6 +427,7 @@ public sealed class MainViewModel : BaseViewModel
         Playlist.MediaInfos.RemoveAt(selectedIndex);
         var temp = Playlist.MediaInfos.AsEnumerable();
         Playlist.MediaInfos = new ObservableCollection<MediaInfo>(temp);
+        CountPlaylistDuration();
         
         if (_playedMediaIndex <= selectedIndex) return;
         --_playedMediaIndex;
