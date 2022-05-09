@@ -204,4 +204,7 @@
   <data name="Clear" xml:space="preserve">
     <value>Clean</value>
   </data>
+  <data name="AppName" xml:space="preserve">
+    <value>NedoPlayer</value>
+  </data>
 </root>

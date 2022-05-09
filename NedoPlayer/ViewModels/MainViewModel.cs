@@ -119,6 +119,9 @@ public sealed class MainViewModel : BaseViewModel
     public ICommand ShowHelpCommand { get; private set; }
     public ICommand PlaySelectedCommand { get; private set; }
     public ICommand OpenFileInfoCommand { get; private set; }
+    
+    public ICommand PlayCommand { get; private set; }
+    public ICommand PauseCommand { get; private set; }
 
     private readonly IOService _fileDialogService;
     private readonly IStateService _windowStateService;
@@ -212,6 +215,9 @@ public sealed class MainViewModel : BaseViewModel
             var filePath = $"{CurrentMedia.Path}{CurrentMedia.Title}";
             FilePropertiesWindow.Show(filePath);
         }, _ => Playlist.MediaInfos.Any());
+
+        PlayCommand = new RelayCommand(_ => MediaControlController.Play(), _ => Playlist.MediaInfos.Any());
+        PauseCommand = new RelayCommand(_ => MediaControlController.Pause(), _ => Playlist.MediaInfos.Any());
     }
 
     private void Close(object? s)
@@ -273,8 +279,8 @@ public sealed class MainViewModel : BaseViewModel
             Playlist.MediaInfos.Clear();
             _playedMediaIndex = -1;
         }
-        
-        var allowedExt = new[] {"mp3", "mp4", "webm", "mkv", "flv", "avi", "amv"};
+
+        string[] allowedExt = {"mp3", "mp4", "webm", "mkv", "flv", "wav", "ogg", "oga", "mogg"};
         
         foreach (var f in Directory.GetFiles(folder).Where(f => allowedExt.Any(f.ToLower().EndsWith)))
         {
@@ -405,7 +411,8 @@ public sealed class MainViewModel : BaseViewModel
         string folder = _fileDialogService.OpenFolderDialog(@"C:\");
         if (string.IsNullOrWhiteSpace(folder)) return;
         
-        var allowedExt = new[] {"mp3", "mp4", "webm", "mkv", "flv", "avi", "amv"};
+        string[] allowedExt = {"mp3", "mp4", "webm", "mkv", "flv", "wav", "ogg", "oga", "mogg"};
+
         
         foreach (var f in Directory.GetFiles(folder).Where(f => allowedExt.Any(f.ToLower().EndsWith)))
         {
@@ -447,6 +454,7 @@ public sealed class MainViewModel : BaseViewModel
         _playedMediaIndex = -1;
         Playlist.MediaInfos.Clear();
         TrackTitle = "";
+        Playlist.TotalDuration = TimeSpan.Zero;
     }
 
     private void PlaySelected(int selectedIndex)
@@ -519,7 +527,8 @@ public sealed class MainViewModel : BaseViewModel
     /// </summary>
     private void CountPlaylistDuration()
     {
+        Playlist.TotalDuration = TimeSpan.Zero;
         foreach (var mediaInfo in Playlist.MediaInfos)
-            Playlist.TotalDuration += mediaInfo.Duration.GetValueOrDefault();
+            Playlist.TotalDuration += mediaInfo.Duration.GetValueOrDefault(TimeSpan.Zero);
     }
 }

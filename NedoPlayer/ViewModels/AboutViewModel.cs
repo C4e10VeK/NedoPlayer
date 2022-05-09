@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Navigation;
 using NedoPlayer.NedoEventAggregator;
 using NedoPlayer.Utils;
 
@@ -19,6 +21,7 @@ public class AboutViewModel : BaseViewModel
     public string NicknameCreator { get; }
 
     public ICommand CloseCommand { get; }
+    public ICommand OpenLinkCommand { get; }
     
     public AboutViewModel(IEventAggregator aggregator) : base(aggregator)
     {
@@ -30,6 +33,14 @@ public class AboutViewModel : BaseViewModel
         NicknameCreator = "Che10VeK";
 
         CloseCommand = new RelayCommand(Close);
+        OpenLinkCommand = new RelayCommand(OpenLink);
+    }
+
+    private void OpenLink(object? obj)
+    {
+        if (obj is not RequestNavigateEventArgs args) return;
+        Process.Start(new ProcessStartInfo(args.Uri.AbsoluteUri));
+        args.Handled = true;
     }
 
     private void Close(object? s)
