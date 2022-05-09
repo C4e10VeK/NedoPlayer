@@ -6,8 +6,8 @@
         <UseWPF>true</UseWPF>
         <ApplicationIcon>Resources\img\favicon.ico</ApplicationIcon>
         <LangVersion>10</LangVersion>
-        <AssemblyVersion>1.0.1.50522</AssemblyVersion>
-        <Version>1.0.1.50522</Version>
+        <AssemblyVersion>1.0.1.90522</AssemblyVersion>
+        <Version>1.0.1.90522</Version>
         <NeutralLanguage>en-US</NeutralLanguage>
         <PlatformTarget>x64</PlatformTarget>
         <Company>Che10VeK</Company>
