@@ -13,7 +13,8 @@
         <Company>Che10VeK</Company>
         <PublicSign>false</PublicSign>
         <TargetFramework>net48</TargetFramework>
-        <Platforms>AnyCPU;x86;x64</Platforms>
+        <Platforms>AnyCPU</Platforms>
+        <Configurations>Debug;Release</Configurations>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0-windows|AnyCPU'">
