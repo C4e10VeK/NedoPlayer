@@ -14,6 +14,7 @@
                  ResizeMode="NoResize"
                  ShowMinButton="False"
                  ShowMaxRestoreButton="False"
+                 AllowDrop="True"
                  Title="{x:Static p:Resource.Playlist}" Height="600" Width="400"
                  DataContext="{Binding PlaylistViewModel, Source={StaticResource ViewModelLocator}}">
     <b:Interaction.Triggers>
@@ -21,6 +22,9 @@
             <b:InvokeCommandAction Command="{Binding CloseCommand}"
                                    CommandParameter="{Binding ElementName=ThisPlaylistWindow}"
                                    PassEventArgsToCommand="False" />
+        </b:EventTrigger>
+        <b:EventTrigger EventName="Drop">
+            <b:InvokeCommandAction Command="{Binding DropCommand}" PassEventArgsToCommand="True" />
         </b:EventTrigger>
     </b:Interaction.Triggers>
     <mah:MetroWindow.IconTemplate>
@@ -43,7 +47,9 @@
                                   AddMediaCommand="{Binding AddMediaCommand}"
                                   AddFolderCommand="{Binding AddFolderCommand}"
                                   ClearPlaylistCommand="{Binding ClearPlaylistCommand}"
-                                  PlaySelectedCommand="{Binding PlaySelectedCommand}"/>
+                                  PlaySelectedCommand="{Binding PlaySelectedCommand}"
+                                  DropItemCommand="{Binding DropItemCommand}"
+                                  DragOverItemCommand="{Binding DragOverItemCommand}"/>
         <Button Grid.Row="1"
                 Margin="10"
                 Width="75" Height="25"

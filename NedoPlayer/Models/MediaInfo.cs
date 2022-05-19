@@ -2,7 +2,7 @@
 
 namespace NedoPlayer.Models;
 
-public class MediaInfo : ModelBase, IComparable<MediaInfo>, IEquatable<MediaInfo>
+public class MediaInfo : ModelBase
 {
     private int _groupId;
 
@@ -82,26 +82,6 @@ public class MediaInfo : ModelBase, IComparable<MediaInfo>, IEquatable<MediaInfo
         _duration = duration;
         _isRepeat = false;
         _isPlaying = false;
-    }
-
-    public int CompareTo(MediaInfo? other)
-    {
-        if (ReferenceEquals(this, other)) return 0;
-        return ReferenceEquals(null, other) ? 1 : GroupId.CompareTo(other.GroupId);
-    }
-
-    public bool Equals(MediaInfo? other)
-    {
-        if (ReferenceEquals(null, other)) return false;
-        if (ReferenceEquals(this, other)) return true;
-        return GroupId == other.GroupId;
-    }
-
-    public override bool Equals(object? obj)
-    {
-        if (ReferenceEquals(null, obj)) return false;
-        if (ReferenceEquals(this, obj)) return true;
-        return obj.GetType() == GetType() && Equals((MediaInfo)obj);
     }
 
     public override string ToString()

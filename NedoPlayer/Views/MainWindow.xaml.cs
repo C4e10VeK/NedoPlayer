@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Threading;
 using NedoPlayer.ViewModels;
 using Application = System.Windows.Application;
@@ -103,6 +104,15 @@ public partial class MainWindow
             if (vm is not MainViewModel viewModel) return;
             if (viewModel.MediaControlModel.TotalDuration.TotalSeconds > 0) VideoPlayer.Position = position;
         };
+    }
+    
+    protected override void OnSourceInitialized(EventArgs e)
+    {
+        // if (PresentationSource.FromVisual(this) is not HwndSource{CompositionTarget: not null} hwndSource) return;
+        // var hwndTarget = hwndSource.CompositionTarget;
+        // hwndTarget.RenderMode = RenderMode.SoftwareOnly;
+
+        base.OnSourceInitialized(e);
     }
 
     private void MainWindow_OnMouseMove(object sender, MouseEventArgs e)
