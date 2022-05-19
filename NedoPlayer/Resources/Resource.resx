@@ -160,7 +160,7 @@
     <value>Total duration</value>
   </data>
   <data name="MediaFileFilter" xml:space="preserve">
-    <value>Video files (*.mp4,*.mkv,*.flv,*.webm)|*.mp4;*.mkv;*.flv;*.webm|Audio files (*.mp3,*.wav,*.ogg,*.oga,*.mogg,*.webm)|*.mp3;*.wav;*.ogg;*.oga;*.mogg;*.webm|All files (*.*)|*.*</value>
+    <value>Video files (*.mp4,*.mkv,*.flv,*.webm)|*.mp4;*.mkv;*.webm|Audio files (*.mp3,*.wav,*.ogg,*.oga,*.mogg,*.webm)|*.mp3;*.wav;*.ogg;*.oga;*.mogg;*.webm|All files (*.*)|*.*</value>
   </data>
   <data name="Playlist" xml:space="preserve">
     <value>Playlist</value>

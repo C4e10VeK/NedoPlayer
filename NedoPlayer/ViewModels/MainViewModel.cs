@@ -323,7 +323,7 @@ public sealed class MainViewModel : BaseViewModel
     private void DropFileOpen(object? o)
     {
         if (o is not DragEventArgs args) return;
-        string[] allowedExt = {"mp3", "mp4", "webm", "mkv", "flv", "wav", "ogg", "oga", "mogg"};
+        string[] allowedExt = {"mp3", "mp4", "webm", "mkv", "wav", "ogg", "oga", "mogg"};
         
         var files = (string[]) args.Data.GetData(DataFormats.FileDrop) ?? Array.Empty<string>();
 
@@ -409,7 +409,7 @@ public sealed class MainViewModel : BaseViewModel
             _playedMediaIndex = -1;
         }
 
-        string[] allowedExt = {"mp3", "mp4", "webm", "mkv", "flv", "wav", "ogg", "oga", "mogg"};
+        string[] allowedExt = {"mp3", "mp4", "webm", "mkv", "wav", "ogg", "oga", "mogg"};
         
         foreach (var f in Directory.GetFiles(folder).Where(f => allowedExt.Any(f.ToLower().EndsWith)))
         {
@@ -540,7 +540,7 @@ public sealed class MainViewModel : BaseViewModel
         string folder = _fileDialogService.OpenFolderDialog(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
         if (string.IsNullOrWhiteSpace(folder)) return;
         
-        string[] allowedExt = {"mp3", "mp4", "webm", "mkv", "flv", "wav", "ogg", "oga", "mogg"};
+        string[] allowedExt = {"mp3", "mp4", "webm", "mkv", "wav", "ogg", "oga", "mogg"};
 
         
         foreach (var f in Directory.GetFiles(folder).Where(f => allowedExt.Any(f.ToLower().EndsWith)))
