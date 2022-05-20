@@ -147,9 +147,6 @@
   <data name="Mute" xml:space="preserve">
     <value>Mute/Unmute</value>
   </data>
-  <data name="Stop" xml:space="preserve">
-    <value>Stop</value>
-  </data>
   <data name="NextMedia" xml:space="preserve">
     <value>Next</value>
   </data>
@@ -195,11 +192,11 @@
   <data name="Delete" xml:space="preserve">
     <value>Delete</value>
   </data>
-  <data name="MediaUp" xml:space="preserve">
-    <value>Up</value>
+  <data name="SavePlaylist" xml:space="preserve">
+    <value>Save playlist</value>
   </data>
-  <data name="MediaDown" xml:space="preserve">
-    <value>Down</value>
+  <data name="OpenPlaylist" xml:space="preserve">
+    <value>Open playlist</value>
   </data>
   <data name="Clear" xml:space="preserve">
     <value>Clean</value>

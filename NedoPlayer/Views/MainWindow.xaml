@@ -212,12 +212,12 @@
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator />
-                <MenuItem Header="Open playlist" Command="{Binding OpenPlaylistFileCommand}">
+                <MenuItem Header="{x:Static p:Resource.OpenPlaylist}" Command="{Binding OpenPlaylistFileCommand}">
                     <MenuItem.Icon>
                         <iconPacks:PackIconMaterial Kind="PlaylistMusic" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Save playlist" Command="{Binding SavePlaylistCommand}">
+                <MenuItem Header="{x:Static p:Resource.SavePlaylist}" Command="{Binding SavePlaylistCommand}">
                     <MenuItem.Icon>
                         <iconPacks:PackIconMaterial Kind="ContentSave" />
                     </MenuItem.Icon>
