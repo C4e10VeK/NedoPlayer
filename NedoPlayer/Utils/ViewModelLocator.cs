@@ -12,7 +12,7 @@ public class ViewModelLocator
 
     public MainViewModel MainViewModel => _mainViewModel ??=
         new MainViewModel(EventAggregator.Instance, 
-            ServiceLocator.Instance.Container.Get<IOService>(),
+            ServiceLocator.Instance.Container.Get<IFileService>(),
             ServiceLocator.Instance.Container.Get<IStateService>(),
             ServiceLocator.Instance.Container.Get<IWindowService>(),
             ServiceLocator.Instance.Container.Get<IConfigFileService>());

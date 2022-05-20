@@ -18,6 +18,8 @@ using NedoPlayer.NedoEventAggregator;
 using NedoPlayer.Services;
 using NedoPlayer.Utils;
 using NedoPlayer.Views;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 using Application = System.Windows.Application;
 using DataFormats = System.Windows.DataFormats;
 using DragDropEffects = System.Windows.DragDropEffects;
@@ -128,8 +130,11 @@ public sealed class MainViewModel : BaseViewModel
     public ICommand DropCommand { get; private set; }
     public ICommand DragOverItemCommand { get; private set; }
     public ICommand DropItemCommand { get; private set; }
+    
+    public ICommand OpenPlaylistFileCommand { get; private set; }
+    public ICommand SavePlaylistCommand { get; private set; }
 
-    private readonly IOService _fileDialogService;
+    private readonly IFileService _fileDialogService;
     private readonly IStateService _windowStateService;
     private readonly IWindowService _windowService;
     private int _playedMediaIndex;
@@ -146,7 +151,7 @@ public sealed class MainViewModel : BaseViewModel
     private readonly SubscriptionToken _dropItemEventToken;
     private readonly SubscriptionToken _dragOverItemEventToken;
 
-    public MainViewModel(IEventAggregator aggregator, IOService fileService, IStateService windowStateService,
+    public MainViewModel(IEventAggregator aggregator, IFileService fileService, IStateService windowStateService,
         IWindowService windowService, IConfigFileService configFileService) : base(aggregator)
     {
         _fileDialogService = fileService;
@@ -231,6 +236,18 @@ public sealed class MainViewModel : BaseViewModel
         DragOverItemCommand = new RelayCommand(DragOverItem);
         
         DropItemCommand = new RelayCommand(DropItem);
+
+        OpenPlaylistFileCommand = new RelayCommand(_ =>
+        {
+            Playlist.MediaInfos.Clear();
+            Playlist = _fileDialogService.OpenPlaylist(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
+            Aggregator.GetEvent<PlaylistUpdateEvent>().Publish(Playlist);
+            NextMediaFile();
+            PlayPauseSwitch();
+        });
+        
+        SavePlaylistCommand =
+            new RelayCommand(_ => _fileDialogService.SavePlaylist(Playlist), _ => Playlist.MediaInfos.Any());
     }
 
     private void DropItem(object? o)
@@ -323,10 +340,23 @@ public sealed class MainViewModel : BaseViewModel
     private void DropFileOpen(object? o)
     {
         if (o is not DragEventArgs args) return;
+
         string[] allowedExt = {"mp3", "mp4", "webm", "mkv", "wav", "ogg", "oga", "mogg"};
         
         var files = (string[]) args.Data.GetData(DataFormats.FileDrop) ?? Array.Empty<string>();
 
+        if (files[0].ToLower().EndsWith(".nypl"))
+        {
+            var deserializer = new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
+            var fileText = File.ReadAllText(files[0]);
+            var res = deserializer.Deserialize<Playlist>(fileText);
+            Playlist = res;
+            Aggregator.GetEvent<PlaylistUpdateEvent>().Publish(Playlist);
+            NextMediaFile();
+            PlayPauseSwitch();
+            return;
+        }
+        
         foreach (var f in files)
         {
             if (Directory.Exists(f))
@@ -360,6 +390,8 @@ public sealed class MainViewModel : BaseViewModel
         Aggregator.GetEvent<ClearPlaylistEvent>().Unsubscribe(_clearPlaylistEventToken);
         Aggregator.GetEvent<PlaySelectedEvent>().Unsubscribe(_playSelectedEventToken);
         Aggregator.GetEvent<DropEvent>().Unsubscribe(_dropEventToken);
+        Aggregator.GetEvent<DropItemEvent>().Unsubscribe(_dropItemEventToken);
+        Aggregator.GetEvent<DragOverItemEvent>().Unsubscribe(_dragOverItemEventToken);
 
         MediaControlController.CloseMedia();
         wnd.Close();

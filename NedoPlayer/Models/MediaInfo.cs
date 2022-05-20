@@ -74,6 +74,16 @@ public class MediaInfo : ModelBase
         }
     }
 
+    public MediaInfo()
+    {
+        _groupId = 0;
+        _path = "";
+        _title = "";
+        _duration = TimeSpan.Zero;
+        _isRepeat = false;
+        _isPlaying = false;
+    }
+    
     public MediaInfo(int groupId, string path = "", string title = "", TimeSpan? duration = null)
     {
         _groupId = groupId;

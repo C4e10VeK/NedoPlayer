@@ -51,6 +51,7 @@
         <KeyBinding Gesture="CTRL+Q" Command="{Binding CloseCommand}" CommandParameter="{Binding ElementName=ThisMainWindow}" />
         <KeyBinding Gesture="CTRL+O" Command="{Binding OpenFileCommand}" />
         <KeyBinding Gesture="CTRL+SHIFT+O" Command="{Binding OpenFolderCommand}" />
+        <KeyBinding Gesture="CTRL+S" Command="{Binding SavePlaylistCommand}" />
         <KeyBinding Gesture="CTRL+SPACE" Command="{Binding PlayPauseCommand}" />
         <KeyBinding Gesture="ESCAPE" Command="{Binding MinimizeCommand}" />
     </mah:MetroWindow.InputBindings>
@@ -208,6 +209,17 @@
                           Command="{Binding AddFolderToPlaylistCommand}">
                     <MenuItem.Icon>
                         <iconPacks:PackIconMaterial Kind="FolderPlus" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="Open playlist" Command="{Binding OpenPlaylistFileCommand}">
+                    <MenuItem.Icon>
+                        <iconPacks:PackIconMaterial Kind="PlaylistMusic" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Save playlist" Command="{Binding SavePlaylistCommand}">
+                    <MenuItem.Icon>
+                        <iconPacks:PackIconMaterial Kind="ContentSave" />
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator />

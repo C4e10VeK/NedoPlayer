@@ -9,7 +9,7 @@ public class ServiceLocator
     private ServiceLocator()
     {
         Container = new ServiceContainer();
-        Container.Bind<IOService, FileService>();
+        Container.Bind<IFileService, FileService>();
         Container.Bind<IStateService, WindowStateService>();
         Container.Bind<IWindowService, WindowService>();
         Container.Bind<IConfigFileService, ConfigFileService>();
