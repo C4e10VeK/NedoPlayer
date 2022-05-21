@@ -18,7 +18,6 @@ internal class FileService : IFileService
 {
     private struct InternalMediaInfo
     {
-        public int GroupId;
         public string Path;
         public string Title;
         public TimeSpan? Duration;
@@ -59,7 +58,7 @@ internal class FileService : IFileService
 
         List<InternalMediaInfo> internalMediaInfos = playlist.MediaInfos.Select(mediaInfo => new InternalMediaInfo
         {
-            GroupId = mediaInfo.GroupId, Path = mediaInfo.Path, Title = mediaInfo.Title, Duration = mediaInfo.Duration
+            Path = mediaInfo.Path, Title = mediaInfo.Title, Duration = mediaInfo.Duration
         }).ToList();
 
         var serialization = new SerializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
@@ -76,7 +75,9 @@ internal class FileService : IFileService
         var deserializer = new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
         var fileText = File.ReadAllText(fileName);
         var internalMediaInfos = deserializer.Deserialize<List<InternalMediaInfo>>(fileText)
-            .Select(x => new MediaInfo(x.GroupId, x.Path, x.Title, x.Duration));
+            .Select(x => new MediaInfo(0, x.Path, x.Title, x.Duration))
+            .Where(mediaInfo => File.Exists(mediaInfo.Path + mediaInfo.Title))
+            .ToList();
 
         var res = new Playlist
         {

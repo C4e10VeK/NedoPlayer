@@ -182,6 +182,8 @@ public sealed class MainViewModel : BaseViewModel
     public void OpenPlaylistFile(string filePath)
     {
         Playlist = _fileDialogService.OpenPlaylist(filePath);
+        UpdateGroupId();
+        Playlist.MediaInfos = new ObservableCollection<MediaInfo>(Playlist.MediaInfos);
         CountPlaylistDuration();
         Aggregator.GetEvent<PlaylistUpdateEvent>().Publish(Playlist);
         NextMediaFile();
@@ -259,6 +261,8 @@ public sealed class MainViewModel : BaseViewModel
         Playlist.MediaInfos.Clear();
         _playedMediaIndex = -1;
         Playlist = _fileDialogService.OpenPlaylist(filePath);
+        UpdateGroupId();
+        Playlist.MediaInfos = new ObservableCollection<MediaInfo>(Playlist.MediaInfos);
         CountPlaylistDuration();
         Aggregator.GetEvent<PlaylistUpdateEvent>().Publish(Playlist);
         NextMediaFile();
@@ -349,6 +353,8 @@ public sealed class MainViewModel : BaseViewModel
             Playlist.MediaInfos.Clear();
             _playedMediaIndex = -1;
             Playlist = _fileDialogService.OpenPlaylist(files[0]);
+            UpdateGroupId();
+            Playlist.MediaInfos = new ObservableCollection<MediaInfo>(Playlist.MediaInfos);
             CountPlaylistDuration();
             Aggregator.GetEvent<PlaylistUpdateEvent>().Publish(Playlist);
             NextMediaFile();
