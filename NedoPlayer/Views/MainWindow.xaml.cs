@@ -55,6 +55,11 @@ public partial class MainWindow
     private void OpenMediaFromArgs()
     {
         if (App.Args == null || !File.Exists(App.Args[0]) || DataContext is not MainViewModel dt) return;
+        if (App.Args[0].ToLower().EndsWith(".nypl"))
+        {
+            dt.OpenPlaylistFile(App.Args[0]);
+            return;
+        }
         dt.OpenMediaFileInternal(App.Args[0]);
         dt.NextMediaCommand.Execute(null);
         dt.MediaControlModel.IsPaused = false;
@@ -104,15 +109,6 @@ public partial class MainWindow
             if (vm is not MainViewModel viewModel) return;
             if (viewModel.MediaControlModel.TotalDuration.TotalSeconds > 0) VideoPlayer.Position = position;
         };
-    }
-    
-    protected override void OnSourceInitialized(EventArgs e)
-    {
-        // if (PresentationSource.FromVisual(this) is not HwndSource{CompositionTarget: not null} hwndSource) return;
-        // var hwndTarget = hwndSource.CompositionTarget;
-        // hwndTarget.RenderMode = RenderMode.SoftwareOnly;
-
-        base.OnSourceInitialized(e);
     }
 
     private void MainWindow_OnMouseMove(object sender, MouseEventArgs e)

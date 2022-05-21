@@ -183,6 +183,17 @@ public sealed class MainViewModel : BaseViewModel
         InitCommands();
     }
 
+    public void OpenPlaylistFile(string file)
+    {
+        var deserializer = new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
+        var fileText = File.ReadAllText(file);
+        var res = deserializer.Deserialize<Playlist>(fileText);
+        Playlist = res;
+        Aggregator.GetEvent<PlaylistUpdateEvent>().Publish(Playlist);
+        NextMediaFile();
+        PlayPauseSwitch();
+    }
+
     private void InitCommands()
     {
         CloseCommand = new RelayCommand(Close);
@@ -270,19 +281,6 @@ public sealed class MainViewModel : BaseViewModel
             
             if (_playedMediaIndex > 0) --_playedMediaIndex;
             if (Playlist[targetIndex].IsPlaying) _playedMediaIndex = targetIndex;
-
-            if (Playlist.MediaInfos[targetIndex - 1].Path != Playlist[targetIndex].Path)
-            {
-                Playlist[targetIndex].GroupId = Playlist[targetIndex - 1].GroupId + 1;
-
-                for (int i = targetIndex + 1; i < Playlist.MediaInfos.Count; i++)
-                    Playlist[i].GroupId += 2;
-            }
-            else if (Playlist.MediaInfos[targetIndex - 1].Path == Playlist[targetIndex].Path)
-                Playlist[targetIndex].GroupId = Playlist[targetIndex - 1].GroupId;
-            else if (targetIndex + 1 < Playlist.MediaInfos.Count && Playlist.MediaInfos[targetIndex + 1].Path == Playlist[targetIndex].Path)
-                Playlist[targetIndex].GroupId = Playlist[targetIndex + 1].GroupId;
-            
         }
         else if (sourceIndex > targetIndex)
         {
@@ -293,35 +291,32 @@ public sealed class MainViewModel : BaseViewModel
             Playlist.MediaInfos.RemoveAt(removeIndex);
             ++_playedMediaIndex;
             if (Playlist[targetIndex].IsPlaying) _playedMediaIndex = targetIndex;
-
-            if (Playlist.MediaInfos[targetIndex + 1].Path != Playlist[targetIndex].Path)
-            {
-                Playlist[targetIndex].GroupId = Playlist[targetIndex + 1].GroupId;
-
-                for (int i = targetIndex + 1; i < Playlist.MediaInfos.Count; i++)
-                    Playlist[i].GroupId += 1;
-            }
-            else if (Playlist.MediaInfos[targetIndex + 1].Path == Playlist[targetIndex].Path)
-                Playlist[targetIndex].GroupId = Playlist[targetIndex + 1].GroupId;
-            
-            else if (targetIndex - 1 >= 0 && Playlist.MediaInfos[targetIndex - 1].Path == Playlist[targetIndex].Path)
-                Playlist[targetIndex].GroupId = Playlist[targetIndex - 1].GroupId;
-            
         }
 
-        if (Playlist.MediaInfos.All(m => m.GroupId != 0))
-            foreach (var item in Playlist.MediaInfos)
-            {
-                item.GroupId--;
-            }
-        
-        for (var index = 0; index < Playlist.MediaInfos.Count; index++)
-        {
-            if (index != 0 && Playlist[index].Path == Playlist[index - 1].Path)
-                Playlist[index].GroupId = Playlist[index - 1].GroupId;
-        }
-
+        UpdateGroupId();
         Playlist.MediaInfos = new ObservableCollection<MediaInfo>(Playlist.MediaInfos);
+    }
+
+    private void UpdateGroupId()
+    {
+        for (int index = 0, j = 0; index < Playlist.MediaInfos.Count; index++)
+        {
+            var item = Playlist.MediaInfos[index];
+
+            switch (index)
+            {
+                case 0:
+                    item.GroupId = j;
+                    break;
+                case > 0 when Playlist[index - 1].Path == item.Path:
+                    item.GroupId = Playlist[index - 1].GroupId;
+                    break;
+                case > 0 when Playlist[index - 1].Path != item.Path:
+                    ++j;
+                    item.GroupId = j;
+                    break;
+            }
+        }
     }
 
     private void DragOverItem(object? o)
@@ -640,6 +635,7 @@ public sealed class MainViewModel : BaseViewModel
     /// <param name="filePath"></param>
     internal void OpenMediaFileInternal(string filePath)
     {
+        // TODO: Rewrite this trash
         if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath)) return;
         string title = Path.GetFileName(filePath);
 
