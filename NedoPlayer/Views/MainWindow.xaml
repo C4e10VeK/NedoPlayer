@@ -10,7 +10,6 @@
                  xmlns:controls="clr-namespace:NedoPlayer.Controls"
                  xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
                  xmlns:p="clr-namespace:NedoPlayer.Resources"
-                 xmlns:utils="clr-namespace:NedoPlayer.Utils"
                  mc:Ignorable="d" 
                  ResizeMode="CanResizeWithGrip"
                  Title="{x:Static p:Resource.AppName}" Height="600" Width="800" MinHeight="500" MinWidth="700"
@@ -20,9 +19,6 @@
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closed">
             <i:InvokeCommandAction Command="{Binding CloseCommand}" CommandParameter="{Binding ElementName=ThisMainWindow}" />
-        </i:EventTrigger>
-        <i:EventTrigger EventName="Drop">
-            <i:InvokeCommandAction Command="{Binding DropCommand}" PassEventArgsToCommand="True" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <mah:MetroWindow.IconTemplate>
@@ -217,7 +213,8 @@
                         <iconPacks:PackIconMaterial Kind="PlaylistMusic" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="{x:Static p:Resource.SavePlaylist}" Command="{Binding SavePlaylistCommand}">
+                <MenuItem Header="{x:Static p:Resource.SavePlaylist}" InputGestureText="Ctrl+S"
+                          Command="{Binding SavePlaylistCommand}">
                     <MenuItem.Icon>
                         <iconPacks:PackIconMaterial Kind="ContentSave" />
                     </MenuItem.Icon>

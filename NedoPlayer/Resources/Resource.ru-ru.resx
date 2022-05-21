@@ -190,7 +190,7 @@
     <value>Удалить</value>
   </data>
   <data name="OpenPlaylist" xml:space="preserve">
-    <value>Сохранить плейлист</value>
+    <value>Открыть плейлист</value>
   </data>
   <data name="SavePlaylist" xml:space="preserve">
     <value>Сохранить плейлист</value>

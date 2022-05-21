@@ -14,7 +14,6 @@
                  ResizeMode="NoResize"
                  ShowMinButton="False"
                  ShowMaxRestoreButton="False"
-                 AllowDrop="True"
                  Title="{x:Static p:Resource.Playlist}" Height="600" Width="400"
                  DataContext="{Binding PlaylistViewModel, Source={StaticResource ViewModelLocator}}">
     <b:Interaction.Triggers>
@@ -23,9 +22,6 @@
                                    CommandParameter="{Binding ElementName=ThisPlaylistWindow}"
                                    PassEventArgsToCommand="False" />
         </b:EventTrigger>
-        <b:EventTrigger EventName="Drop">
-            <b:InvokeCommandAction Command="{Binding DropCommand}" PassEventArgsToCommand="True" />
-        </b:EventTrigger>
     </b:Interaction.Triggers>
     <mah:MetroWindow.IconTemplate>
         <DataTemplate>
@@ -33,7 +29,12 @@
                                         Kind="PlaylistMusic" />
         </DataTemplate>
     </mah:MetroWindow.IconTemplate>
-    <Grid>
+    <Grid AllowDrop="True">
+        <b:Interaction.Triggers>
+            <b:EventTrigger EventName="Drop">
+                <b:InvokeCommandAction Command="{Binding DropCommand}" PassEventArgsToCommand="True" />
+            </b:EventTrigger>
+        </b:Interaction.Triggers>
         <Grid.RowDefinitions>
             <RowDefinition Height="500" />
             <RowDefinition Height="*" />
