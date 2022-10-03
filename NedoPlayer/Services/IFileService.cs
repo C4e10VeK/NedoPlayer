@@ -2,7 +2,7 @@
 
 namespace NedoPlayer.Services;
 
-public interface IFileService
+public interface IFileService : IService
 {
     public string OpenFileDialog(string path);
     public string OpenFileDialog(string path, string filter);

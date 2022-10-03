@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Forms;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using NedoPlayer.Models;
@@ -11,6 +12,7 @@ using NedoPlayer.Resources;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using Application = System.Windows.Application;
+using MessageBox = System.Windows.MessageBox;
 
 namespace NedoPlayer.Services;
 
@@ -74,16 +76,25 @@ internal class FileService : IFileService
         
         var deserializer = new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
         var fileText = File.ReadAllText(fileName);
-        var internalMediaInfos = deserializer.Deserialize<List<InternalMediaInfo>>(fileText)
-            .Select(x => new MediaInfo(0, x.Path, x.Title, x.Duration))
-            .Where(mediaInfo => File.Exists(mediaInfo.Path + mediaInfo.Title))
-            .ToList();
-
-        var res = new Playlist
+        try
         {
-            MediaInfos = new ObservableCollection<MediaInfo>(internalMediaInfos)
-        };
+            var internalMediaInfos = deserializer.Deserialize<List<InternalMediaInfo>>(fileText)
+                .Select(x => new MediaInfo(0, x.Path, x.Title, x.Duration))
+                .Where(mediaInfo => File.Exists(mediaInfo.Path + mediaInfo.Title))
+                .ToList();
+
+            var res = new Playlist
+            {
+                MediaInfos = new ObservableCollection<MediaInfo>(internalMediaInfos)
+            };
         
-        return res;
+            return res;
+        }
+        catch (Exception)
+        {
+            MessageBox.Show($"Файл {Path.GetFileName(fileName)} поврежден или имеет недопустимый формат.", "Ошибка",
+                MessageBoxButton.OK, MessageBoxImage.Error);
+            return new Playlist();
+        }
     }
 }

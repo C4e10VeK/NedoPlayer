@@ -2,7 +2,7 @@
 
 namespace NedoPlayer.Services;
 
-public interface IConfigFileService
+public interface IConfigFileService : IService
 {
     public string Read(string key, string? section = "config");
     public T Read<T>(string key, string? section = "config") where T : IConvertible;

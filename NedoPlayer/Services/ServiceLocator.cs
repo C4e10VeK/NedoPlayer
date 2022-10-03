@@ -2,16 +2,14 @@
 
 public class ServiceLocator
 {
-    public static ServiceLocator Instance { get; } = new();
+    private readonly ServiceContainer _container = new();
+    public IServiceContainer Container => _container;
 
-    public IServiceContainer Container { get; }
-
-    private ServiceLocator()
+    public ServiceLocator()
     {
-        Container = new ServiceContainer();
-        Container.Bind<IFileService, FileService>();
-        Container.Bind<IStateService, WindowStateService>();
-        Container.Bind<IWindowService, WindowService>();
-        Container.Bind<IConfigFileService, ConfigFileService>();
+        _container.Bind<IFileService, FileService>();
+        _container.Bind<IStateService, WindowStateService>();
+        _container.Bind<IWindowService, WindowService>();
+        _container.Bind<IConfigFileService, ConfigFileService>();
     }
 }
