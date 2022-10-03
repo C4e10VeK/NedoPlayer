@@ -9,15 +9,17 @@ public class ViewModelLocator
     private MainViewModel? _mainViewModel;
     private AboutViewModel? _aboutViewModel;
     private PlaylistViewModel? _playlistViewModel;
+    private readonly ServiceLocator _serviceLocator = new();
+    private readonly EventAggregator _eventAggregator = new();
 
     public MainViewModel MainViewModel => _mainViewModel ??=
-        new MainViewModel(EventAggregator.Instance, 
-            ServiceLocator.Instance.Container.Get<IOService>(),
-            ServiceLocator.Instance.Container.Get<IStateService>(),
-            ServiceLocator.Instance.Container.Get<IWindowService>(),
-            ServiceLocator.Instance.Container.Get<IConfigFileService>());
+        new MainViewModel(_eventAggregator,
+            _serviceLocator.Container.Get<IFileService>(),
+            _serviceLocator.Container.Get<IStateService>(),
+            _serviceLocator.Container.Get<IWindowService>(),
+            _serviceLocator.Container.Get<IConfigFileService>());
 
-    public AboutViewModel AboutViewModel => _aboutViewModel ??= new AboutViewModel(EventAggregator.Instance);
+    public AboutViewModel AboutViewModel => _aboutViewModel ??= new AboutViewModel(_eventAggregator);
 
-    public PlaylistViewModel PlaylistViewModel => _playlistViewModel ??= new PlaylistViewModel(EventAggregator.Instance);
+    public PlaylistViewModel PlaylistViewModel => _playlistViewModel ??= new PlaylistViewModel(_eventAggregator);
 }

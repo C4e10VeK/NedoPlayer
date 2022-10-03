@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
+using GongSolutions.Wpf.DragDrop;
 using MahApps.Metro.Controls;
 using Microsoft.WindowsAPICodePack.Shell;
 using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
@@ -18,6 +17,9 @@ using NedoPlayer.Services;
 using NedoPlayer.Utils;
 using NedoPlayer.Views;
 using Application = System.Windows.Application;
+using DataFormats = System.Windows.DataFormats;
+using DragDropEffects = System.Windows.DragDropEffects;
+using DragEventArgs = System.Windows.DragEventArgs;
 
 #pragma warning disable CS8618
 
@@ -98,6 +100,7 @@ public sealed class MainViewModel : BaseViewModel
     public ICommand CloseCommand { get; private set; }
     public ICommand PlayPauseCommand { get; private set; }
     public ICommand MaximizeCommand { get; private set; }
+    public ICommand MinimizeCommand { get; private set; }
     public ICommand MuteCommand { get; private set; }
     public ICommand MediaOpenedCommand { get; private set; }
     public ICommand OpenPlaylistCommand { get; private set; }
@@ -119,11 +122,16 @@ public sealed class MainViewModel : BaseViewModel
     public ICommand ShowHelpCommand { get; private set; }
     public ICommand PlaySelectedCommand { get; private set; }
     public ICommand OpenFileInfoCommand { get; private set; }
-    
     public ICommand PlayCommand { get; private set; }
     public ICommand PauseCommand { get; private set; }
+    public ICommand DropCommand { get; private set; }
+    public ICommand DragOverItemCommand { get; private set; }
+    public ICommand DropItemCommand { get; private set; }
+    
+    public ICommand OpenPlaylistFileCommand { get; private set; }
+    public ICommand SavePlaylistCommand { get; private set; }
 
-    private readonly IOService _fileDialogService;
+    private readonly IFileService _fileDialogService;
     private readonly IStateService _windowStateService;
     private readonly IWindowService _windowService;
     private int _playedMediaIndex;
@@ -136,8 +144,11 @@ public sealed class MainViewModel : BaseViewModel
     private readonly SubscriptionToken _addFolderEventToken;
     private readonly SubscriptionToken _clearPlaylistEventToken;
     private readonly SubscriptionToken _playSelectedEventToken;
+    private readonly SubscriptionToken _dropEventToken;
+    private readonly SubscriptionToken _dropItemEventToken;
+    private readonly SubscriptionToken _dragOverItemEventToken;
 
-    public MainViewModel(IEventAggregator aggregator, IOService fileService, IStateService windowStateService,
+    public MainViewModel(IEventAggregator aggregator, IFileService fileService, IStateService windowStateService,
         IWindowService windowService, IConfigFileService configFileService) : base(aggregator)
     {
         _fileDialogService = fileService;
@@ -162,8 +173,21 @@ public sealed class MainViewModel : BaseViewModel
         _addFolderEventToken = Aggregator.GetEvent<AddFolderEvent>().Subscribe(AddFolderToPlaylist);
         _clearPlaylistEventToken = Aggregator.GetEvent<ClearPlaylistEvent>().Subscribe(ClearPlaylist);
         _playSelectedEventToken = Aggregator.GetEvent<PlaySelectedEvent>().Subscribe(PlaySelected);
-
+        _dropEventToken = Aggregator.GetEvent<DropEvent>().Subscribe(DropFileOpen);
+        _dropItemEventToken = Aggregator.GetEvent<DropItemEvent>().Subscribe(DropItem);
+        _dragOverItemEventToken = Aggregator.GetEvent<DragOverItemEvent>().Subscribe(DragOverItem);
+        
         InitCommands();
+    }
+
+    public void OpenPlaylistFile(string filePath)
+    {
+        Playlist = _fileDialogService.OpenPlaylist(filePath);
+        UpdateGroupId();
+        Playlist.MediaInfos = new ObservableCollection<MediaInfo>(Playlist.MediaInfos);
+        CountPlaylistDuration();
+        Aggregator.GetEvent<PlaylistUpdateEvent>().Publish(Playlist);
+        NextMediaFile();
     }
 
     private void InitCommands()
@@ -171,6 +195,7 @@ public sealed class MainViewModel : BaseViewModel
         CloseCommand = new RelayCommand(Close);
         PlayPauseCommand = new RelayCommand( _ => PlayPauseSwitch(), _ => Playlist.MediaInfos.Any());
         MaximizeCommand = new RelayCommand(_ => Maximize());
+        MinimizeCommand = new RelayCommand(_ => Maximize(), _ => MediaControlModel.IsFullscreen);
         MuteCommand = new RelayCommand(_ => MediaControlModel.IsMuted = !MediaControlModel.IsMuted);
         MediaOpenedCommand = new RelayCommand(MediaOpened);
         OpenPlaylistCommand =
@@ -218,6 +243,151 @@ public sealed class MainViewModel : BaseViewModel
 
         PlayCommand = new RelayCommand(_ => MediaControlController.Play(), _ => Playlist.MediaInfos.Any());
         PauseCommand = new RelayCommand(_ => MediaControlController.Pause(), _ => Playlist.MediaInfos.Any());
+
+        DropCommand = new RelayCommand(DropFileOpen);
+
+        DragOverItemCommand = new RelayCommand(DragOverItem);
+        
+        DropItemCommand = new RelayCommand(DropItem);
+
+        OpenPlaylistFileCommand = new RelayCommand(_ => OpenPlaylistFile());
+
+        SavePlaylistCommand =
+            new RelayCommand(
+                _ => _fileDialogService.SavePlaylist(Playlist,
+                    Environment.GetFolderPath(Environment.SpecialFolder.Desktop)), _ => Playlist.MediaInfos.Any());
+    }
+
+    private void OpenPlaylistFile()
+    {
+        string filePath =
+            _fileDialogService.OpenFileDialog(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                @"nypl files (*.nypl)|*.nypl");
+        if (!File.Exists(filePath)) return;
+
+        Playlist.MediaInfos.Clear();
+        _playedMediaIndex = -1;
+        Playlist = _fileDialogService.OpenPlaylist(filePath);
+        UpdateGroupId();
+        Playlist.MediaInfos = new ObservableCollection<MediaInfo>(Playlist.MediaInfos);
+        CountPlaylistDuration();
+        Aggregator.GetEvent<PlaylistUpdateEvent>().Publish(Playlist);
+        NextMediaFile();
+        MediaControlModel.IsPaused = false;
+    }
+
+    private void DropItem(object? o)
+    {
+        if (o is not IDropInfo dropInfo) return;
+        
+        var sourceItem = dropInfo.Data as MediaInfo;
+        var targetItem = dropInfo.TargetItem as MediaInfo;
+
+        if (sourceItem is null && targetItem is null) return;
+
+        int sourceIndex = Playlist.MediaInfos.IndexOf(sourceItem!);
+        int targetIndex = Playlist.MediaInfos.IndexOf(targetItem!);
+        if (targetIndex < 0) return;
+
+        if (sourceIndex < targetIndex)
+        {
+            Playlist.MediaInfos.Insert(targetIndex + 1, sourceItem!);
+            Playlist.MediaInfos.RemoveAt(sourceIndex);
+            
+            if (_playedMediaIndex > 0) --_playedMediaIndex;
+            if (Playlist[targetIndex].IsPlaying) _playedMediaIndex = targetIndex;
+        }
+        else if (sourceIndex > targetIndex)
+        {
+            int removeIndex = sourceIndex + 1;
+            if (Playlist.MediaInfos.Count < removeIndex) return;
+            
+            Playlist.MediaInfos.Insert(targetIndex, sourceItem!);
+            Playlist.MediaInfos.RemoveAt(removeIndex);
+            ++_playedMediaIndex;
+            if (Playlist[targetIndex].IsPlaying) _playedMediaIndex = targetIndex;
+        }
+        
+        UpdateGroupId();
+        Playlist.MediaInfos = new ObservableCollection<MediaInfo>(Playlist.MediaInfos);
+    }
+
+    private void UpdateGroupId()
+    {
+        for (int index = 0, j = 0; index < Playlist.MediaInfos.Count; index++)
+        {
+            switch (index)
+            {
+                case 0:
+                    Playlist.MediaInfos[index].GroupId = j;
+                    break;
+                case > 0 when Playlist[index - 1].Path == Playlist.MediaInfos[index].Path:
+                    Playlist.MediaInfos[index].GroupId = Playlist[index - 1].GroupId;
+                    break;
+                case > 0 when Playlist[index - 1].Path != Playlist.MediaInfos[index].Path:
+                    ++j;
+                    Playlist.MediaInfos[index].GroupId = j;
+                    break;
+            }
+        }
+    }
+
+    private void DragOverItem(object? o)
+    {
+        if (o is not IDropInfo dropInfo) return;
+
+        var sourceItem = dropInfo.Data as MediaInfo;
+        var targetItem = dropInfo.TargetItem as MediaInfo;
+
+        if (sourceItem is null && targetItem is null) return;
+
+        dropInfo.DropTargetAdorner = DropTargetAdorners.Insert;
+        dropInfo.Effects = DragDropEffects.Move;
+    }
+
+    private void DropFileOpen(object? o)
+    {
+        if (o is not DragEventArgs args) return;
+
+        string[] allowedExt = {"mp3", "mp4", "webm", "mkv", "wav", "ogg", "oga", "mogg"};
+        
+        // ReSharper disable once AssignNullToNotNullAttribute
+        // ReSharper disable once NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract
+        var files = (string[]) args.Data.GetData(DataFormats.FileDrop) ?? Array.Empty<string>();
+
+        if (files[0].ToLower().EndsWith("nypl"))
+        {
+            Playlist.MediaInfos.Clear();
+            _playedMediaIndex = -1;
+            Playlist = _fileDialogService.OpenPlaylist(files[0]);
+            UpdateGroupId();
+            Playlist.MediaInfos = new ObservableCollection<MediaInfo>(Playlist.MediaInfos);
+            CountPlaylistDuration();
+            Aggregator.GetEvent<PlaylistUpdateEvent>().Publish(Playlist);
+            NextMediaFile();
+            MediaControlModel.IsPaused = false;
+            return;
+        }
+        
+        foreach (var f in files)
+        {
+            if (Directory.Exists(f))
+            {
+                foreach (var fd in Directory.GetFiles(f).Where(s => allowedExt.Any(s.ToLower().EndsWith)))
+                {
+                    OpenMediaFileInternal(fd);
+                    RunMediaIfFirst();
+                }
+
+                continue;
+            }
+
+            if (File.Exists(f) && allowedExt.Any(f.ToLower().EndsWith))
+            {
+                OpenMediaFileInternal(f);
+                RunMediaIfFirst();
+            }
+        }
     }
 
     private void Close(object? s)
@@ -231,6 +401,9 @@ public sealed class MainViewModel : BaseViewModel
         Aggregator.GetEvent<AddFolderEvent>().Unsubscribe(_addFolderEventToken);
         Aggregator.GetEvent<ClearPlaylistEvent>().Unsubscribe(_clearPlaylistEventToken);
         Aggregator.GetEvent<PlaySelectedEvent>().Unsubscribe(_playSelectedEventToken);
+        Aggregator.GetEvent<DropEvent>().Unsubscribe(_dropEventToken);
+        Aggregator.GetEvent<DropItemEvent>().Unsubscribe(_dropItemEventToken);
+        Aggregator.GetEvent<DragOverItemEvent>().Unsubscribe(_dragOverItemEventToken);
 
         MediaControlController.CloseMedia();
         wnd.Close();
@@ -254,7 +427,7 @@ public sealed class MainViewModel : BaseViewModel
     /// </summary>
     private void OpenFile()
     {
-        string filePath = _fileDialogService.OpenFileDialog(@"C:\");
+        string filePath = _fileDialogService.OpenFileDialog(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
         if (string.IsNullOrWhiteSpace(filePath)) return;
 
         if (Playlist.MediaInfos.Any())
@@ -271,7 +444,7 @@ public sealed class MainViewModel : BaseViewModel
 
     private void OpenFolder()
     {
-        string folder = _fileDialogService.OpenFolderDialog(@"C:\");
+        string folder = _fileDialogService.OpenFolderDialog(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
         if (string.IsNullOrWhiteSpace(folder)) return;
 
         if (Playlist.MediaInfos.Any())
@@ -280,7 +453,7 @@ public sealed class MainViewModel : BaseViewModel
             _playedMediaIndex = -1;
         }
 
-        string[] allowedExt = {"mp3", "mp4", "webm", "mkv", "flv", "wav", "ogg", "oga", "mogg"};
+        string[] allowedExt = {"mp3", "mp4", "webm", "mkv", "wav", "ogg", "oga", "mogg"};
         
         foreach (var f in Directory.GetFiles(folder).Where(f => allowedExt.Any(f.ToLower().EndsWith)))
         {
@@ -399,7 +572,7 @@ public sealed class MainViewModel : BaseViewModel
     /// </summary>
     private void AddFileToPlaylist()
     {
-        string filePath = _fileDialogService.OpenFileDialog(@"C:\");
+        string filePath = _fileDialogService.OpenFileDialog(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
         if (string.IsNullOrWhiteSpace(filePath)) return;
         
         OpenMediaFileInternal(filePath);
@@ -408,10 +581,10 @@ public sealed class MainViewModel : BaseViewModel
     
     private void AddFolderToPlaylist()
     {
-        string folder = _fileDialogService.OpenFolderDialog(@"C:\");
+        string folder = _fileDialogService.OpenFolderDialog(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
         if (string.IsNullOrWhiteSpace(folder)) return;
         
-        string[] allowedExt = {"mp3", "mp4", "webm", "mkv", "flv", "wav", "ogg", "oga", "mogg"};
+        string[] allowedExt = {"mp3", "mp4", "webm", "mkv", "wav", "ogg", "oga", "mogg"};
 
         
         foreach (var f in Directory.GetFiles(folder).Where(f => allowedExt.Any(f.ToLower().EndsWith)))
@@ -425,8 +598,6 @@ public sealed class MainViewModel : BaseViewModel
     {
         if (_playedMediaIndex == selectedIndex) return;
         Playlist.MediaInfos.RemoveAt(selectedIndex);
-        var temp = Playlist.MediaInfos.AsEnumerable();
-        Playlist.MediaInfos = new ObservableCollection<MediaInfo>(temp);
         CountPlaylistDuration();
         
         if (_playedMediaIndex <= selectedIndex) return;
@@ -479,35 +650,30 @@ public sealed class MainViewModel : BaseViewModel
     /// <param name="filePath"></param>
     internal void OpenMediaFileInternal(string filePath)
     {
+        // TODO: Rewrite this trash
         if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath)) return;
         string title = Path.GetFileName(filePath);
+        string path = filePath.Replace(title, "");
 
         // Sorting medias by group
         var tempMediaList = Playlist.MediaInfos.OrderBy(x => x).ToList();
         Debug.Assert(tempMediaList != null, "tempMediaList != null");
         // get group medias by path
         List<MediaInfo> groupList = Playlist.MediaInfos.Where(x => x.Path == filePath.Replace(title, "")).ToList();
+        if (Playlist.MediaInfos.Any(x => x.Path == path && x.Title == title))
+            return;
         
-        // set group id for new media
-        int groupId = tempMediaList.Count == 0 ?
-            0 : !groupList.Any() ? tempMediaList.Last().GroupId + 1 : groupList.First().GroupId;
-
         // Get media duration 
         using ShellObject shell = ShellObject.FromParsingName(filePath);
         ShellProperty<ulong?> prop = shell.Properties.System.Media.Duration;
         ulong duration = prop.Value ?? 0;
         
-        MediaInfo mediaAdd = new MediaInfo(groupId, filePath.Replace(title, ""), title, TimeSpan.FromTicks((long)duration));
-            
-        int lastIndexGroup = !groupList.Any() ? Playlist.MediaInfos.Count : Playlist.MediaInfos.IndexOf(groupList.Last()) + 1;
+        MediaInfo mediaAdd = new MediaInfo(0, filePath.Replace(title, ""), title, TimeSpan.FromTicks((long)duration));
 
-        if (Playlist.MediaInfos.Any(x => x.Path == mediaAdd.Path && x.Title == mediaAdd.Title))
-            return;
-
-        Playlist.MediaInfos.Insert(lastIndexGroup, mediaAdd);
-        var temp = Playlist.MediaInfos.AsEnumerable();
-        Playlist.MediaInfos = new(temp);
-
+        Playlist.MediaInfos.Add(mediaAdd);
+        
+        UpdateGroupId();
+        Playlist.MediaInfos = new ObservableCollection<MediaInfo>(Playlist.MediaInfos);
         CountPlaylistDuration();
     }
 

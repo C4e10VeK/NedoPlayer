@@ -7,8 +7,8 @@
         <UseWindowsForms>true</UseWindowsForms>
         <ApplicationIcon>Resources\img\favicon.ico</ApplicationIcon>
         <LangVersion>10</LangVersion>
-        <AssemblyVersion>1.0.2</AssemblyVersion>
-        <Version>1.0.2</Version>
+        <AssemblyVersion>1.1.0</AssemblyVersion>
+        <Version>1.1.0</Version>
         <NeutralLanguage>en-US</NeutralLanguage>
         <PlatformTarget>x64</PlatformTarget>
         <Company>Che10VeK</Company>
@@ -43,9 +43,14 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="gong-wpf-dragdrop" Version="3.1.1" />
       <PackageReference Include="MahApps.Metro" Version="2.4.9" />
       <PackageReference Include="MahApps.Metro.IconPacks" Version="4.11.0" />
+
       <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.4" />
+
+      <PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
+      <PackageReference Include="YamlDotNet" Version="11.2.1" />
     </ItemGroup>
 
     <ItemGroup>

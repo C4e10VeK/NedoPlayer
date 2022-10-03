@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using GongSolutions.Wpf.DragDrop;
 using NedoPlayer.Models;
 using NedoPlayer.NedoEventAggregator;
 using NedoPlayer.Utils;
@@ -39,6 +40,9 @@ public class PlaylistViewModel : BaseViewModel
     public ICommand AddFolderCommand { get; }
     public ICommand ClearPlaylistCommand { get; }
     public ICommand PlaySelectedCommand { get; }
+    public ICommand DropCommand { get; }
+    public ICommand DropItemCommand { get; }
+    public ICommand DragOverItemCommand { get; }
 
     private readonly SubscriptionToken _playlistUpdateEventToken;
 
@@ -71,6 +75,11 @@ public class PlaylistViewModel : BaseViewModel
             Aggregator.GetEvent<PlaySelectedEvent>().Publish(SelectedMediaIndex);
         },
             _ => Playlist.MediaInfos.Any());
+
+        DropCommand = new RelayCommand(o => Aggregator.GetEvent<DropEvent>().Publish(o));
+
+        DropItemCommand = new RelayCommand(o => Aggregator.GetEvent<DropItemEvent>().Publish((IDropInfo) o!));
+        DragOverItemCommand = new RelayCommand(o => Aggregator.GetEvent<DragOverItemEvent>().Publish((IDropInfo) o!));
     }
 
     private void Close(object? obj)

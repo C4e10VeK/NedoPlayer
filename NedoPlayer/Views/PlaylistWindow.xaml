@@ -29,7 +29,12 @@
                                         Kind="PlaylistMusic" />
         </DataTemplate>
     </mah:MetroWindow.IconTemplate>
-    <Grid>
+    <Grid AllowDrop="True">
+        <b:Interaction.Triggers>
+            <b:EventTrigger EventName="Drop">
+                <b:InvokeCommandAction Command="{Binding DropCommand}" PassEventArgsToCommand="True" />
+            </b:EventTrigger>
+        </b:Interaction.Triggers>
         <Grid.RowDefinitions>
             <RowDefinition Height="500" />
             <RowDefinition Height="*" />
@@ -43,7 +48,9 @@
                                   AddMediaCommand="{Binding AddMediaCommand}"
                                   AddFolderCommand="{Binding AddFolderCommand}"
                                   ClearPlaylistCommand="{Binding ClearPlaylistCommand}"
-                                  PlaySelectedCommand="{Binding PlaySelectedCommand}"/>
+                                  PlaySelectedCommand="{Binding PlaySelectedCommand}"
+                                  DropItemCommand="{Binding DropItemCommand}"
+                                  DragOverItemCommand="{Binding DragOverItemCommand}"/>
         <Button Grid.Row="1"
                 Margin="10"
                 Width="75" Height="25"
