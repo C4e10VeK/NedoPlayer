@@ -178,29 +178,11 @@ namespace NedoPlayer.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Down.
-        /// </summary>
-        public static string MediaDown {
-            get {
-                return ResourceManager.GetString("MediaDown", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Video files (*.mp4,*.mkv,*.flv,*.webm)|*.mp4;*.mkv;*.flv;*.webm|Audio files (*.mp3,*.wav,*.ogg,*.oga,*.mogg,*.webm)|*.mp3;*.wav;*.ogg;*.oga;*.mogg;*.webm|All files (*.*)|*.*.
+        ///   Looks up a localized string similar to Video files (*.mp4,*.mkv,*.flv,*.webm)|*.mp4;*.mkv;*.webm|Audio files (*.mp3,*.wav,*.ogg,*.oga,*.mogg,*.webm)|*.mp3;*.wav;*.ogg;*.oga;*.mogg;*.webm|All files (*.*)|*.*.
         /// </summary>
         public static string MediaFileFilter {
             get {
                 return ResourceManager.GetString("MediaFileFilter", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Up.
-        /// </summary>
-        public static string MediaUp {
-            get {
-                return ResourceManager.GetString("MediaUp", resourceCulture);
             }
         }
         
@@ -237,6 +219,15 @@ namespace NedoPlayer.Resources {
         public static string OpenFolder {
             get {
                 return ResourceManager.GetString("OpenFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open playlist.
+        /// </summary>
+        public static string OpenPlaylist {
+            get {
+                return ResourceManager.GetString("OpenPlaylist", resourceCulture);
             }
         }
         
@@ -295,11 +286,11 @@ namespace NedoPlayer.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Stop.
+        ///   Looks up a localized string similar to Save playlist.
         /// </summary>
-        public static string Stop {
+        public static string SavePlaylist {
             get {
-                return ResourceManager.GetString("Stop", resourceCulture);
+                return ResourceManager.GetString("SavePlaylist", resourceCulture);
             }
         }
         

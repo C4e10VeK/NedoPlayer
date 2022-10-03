@@ -10,7 +10,6 @@
                  xmlns:controls="clr-namespace:NedoPlayer.Controls"
                  xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
                  xmlns:p="clr-namespace:NedoPlayer.Resources"
-                 xmlns:utils="clr-namespace:NedoPlayer.Utils"
                  mc:Ignorable="d" 
                  ResizeMode="CanResizeWithGrip"
                  Title="{x:Static p:Resource.AppName}" Height="600" Width="800" MinHeight="500" MinWidth="700"
@@ -56,9 +55,11 @@
     </mah:MetroWindow.TaskbarItemInfo>
     <mah:MetroWindow.InputBindings>
         <KeyBinding Gesture="CTRL+Q" Command="{Binding CloseCommand}" CommandParameter="{Binding ElementName=ThisMainWindow}" />
-        <KeyBinding Gesture="CTRL+O" Command="{Binding OpenFileCommand}"></KeyBinding>
-        <KeyBinding Gesture="CTRL+SHIFT+O" Command="{Binding OpenFolderCommand}"></KeyBinding>
-        <KeyBinding Gesture="CTRL+SPACE" Command="{Binding PlayPauseCommand}"></KeyBinding>
+        <KeyBinding Gesture="CTRL+O" Command="{Binding OpenFileCommand}" />
+        <KeyBinding Gesture="CTRL+SHIFT+O" Command="{Binding OpenFolderCommand}" />
+        <KeyBinding Gesture="CTRL+S" Command="{Binding SavePlaylistCommand}" />
+        <KeyBinding Gesture="CTRL+SPACE" Command="{Binding PlayPauseCommand}" />
+        <KeyBinding Gesture="ESCAPE" Command="{Binding MinimizeCommand}" />
     </mah:MetroWindow.InputBindings>
     <mah:MetroWindow.Flyouts>
         <mah:FlyoutsControl>
@@ -80,7 +81,9 @@
                                               AddMediaCommand="{Binding AddFileToPlaylistCommand}"
                                               AddFolderCommand="{Binding AddFolderToPlaylistCommand}"
                                               ClearPlaylistCommand="{Binding ClearPlaylistCommand}"
-                                              PlaySelectedCommand="{Binding PlaySelectedCommand}"/>
+                                              PlaySelectedCommand="{Binding PlaySelectedCommand}"
+                                              DragOverItemCommand="{Binding DragOverItemCommand}"
+                                              DropItemCommand="{Binding DropItemCommand}"/>
                     <Button Grid.Row="1"
                             Margin="25"
                             Height="25"
@@ -177,7 +180,12 @@
             </MenuItem>
         </ContextMenu>
     </mah:MetroWindow.ContextMenu>
-    <Grid Background="Black">
+    <Grid Background="Black" AllowDrop="True">
+        <i:Interaction.Triggers>
+            <i:EventTrigger EventName="Drop">
+                <i:InvokeCommandAction Command="{Binding DropCommand}" PassEventArgsToCommand="True" />
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
@@ -207,6 +215,18 @@
                           Command="{Binding AddFolderToPlaylistCommand}">
                     <MenuItem.Icon>
                         <iconPacks:PackIconMaterial Kind="FolderPlus" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="{x:Static p:Resource.OpenPlaylist}" Command="{Binding OpenPlaylistFileCommand}">
+                    <MenuItem.Icon>
+                        <iconPacks:PackIconMaterial Kind="PlaylistMusic" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{x:Static p:Resource.SavePlaylist}" InputGestureText="Ctrl+S"
+                          Command="{Binding SavePlaylistCommand}">
+                    <MenuItem.Icon>
+                        <iconPacks:PackIconMaterial Kind="ContentSave" />
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator />

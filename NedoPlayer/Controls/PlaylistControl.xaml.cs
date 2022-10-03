@@ -1,11 +1,14 @@
-﻿using System.Windows;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using GongSolutions.Wpf.DragDrop;
 using NedoPlayer.Models;
 
 namespace NedoPlayer.Controls;
 
-public partial class PlaylistControl
+public partial class PlaylistControl : UserControl, IDropTarget
 {
     public Playlist PlaylistSource
     {
@@ -96,9 +99,74 @@ public partial class PlaylistControl
     public static readonly DependencyProperty PlaySelectedCommandProperty =
         DependencyProperty.Register(nameof(PlaySelectedCommand), typeof(ICommand), typeof(PlaylistControl),
             new UIPropertyMetadata(null));
+    
+    public ICommand DragOverItemCommand
+    {
+        get => (ICommand)GetValue(DragOverItemCommandProperty);
+        set => SetValue(DragOverItemCommandProperty, value);
+    }
+
+    public static readonly DependencyProperty DragOverItemCommandProperty =
+        DependencyProperty.Register(nameof(DragOverItemCommand), typeof(ICommand), typeof(PlaylistControl),
+            new UIPropertyMetadata(null));
+    
+    public ICommand DropItemCommand
+    {
+        get => (ICommand)GetValue(DropItemCommandProperty);
+        set => SetValue(DropItemCommandProperty, value);
+    }
+
+    public static readonly DependencyProperty DropItemCommandProperty =
+        DependencyProperty.Register(nameof(DropItemCommand), typeof(ICommand), typeof(PlaylistControl),
+            new UIPropertyMetadata(null));
 
     public PlaylistControl()
     {
         InitializeComponent();
+    }
+
+    void IDropTarget.DragEnter(IDropInfo dropInfo)
+    {
+        
+    }
+
+    void IDropTarget.DragOver(IDropInfo dropInfo)
+    {
+        if (DragOverItemCommand is null || !DragOverItemCommand.CanExecute(dropInfo)) return;
+        DragOverItemCommand.Execute(dropInfo);
+    }
+
+    void IDropTarget.DragLeave(IDropInfo dropInfo)
+    {
+        
+    }
+
+    void IDropTarget.Drop(IDropInfo dropInfo)
+    {
+        if (DropItemCommand is null || !DropItemCommand.CanExecute(dropInfo)) return;
+        DropItemCommand.Execute(dropInfo);
+        // var sourceItem = dropInfo.Data as MediaInfo;
+        // var targetItem = dropInfo.TargetItem as MediaInfo;
+        //
+        // if (sourceItem == null && targetItem == null) return;
+        //
+        // int sourceIndex = PlaylistSource.MediaInfos.IndexOf(sourceItem);
+        // int targetIndex = PlaylistSource.MediaInfos.IndexOf(targetItem);
+        //
+        // if (sourceIndex < targetIndex)
+        // {
+        //     PlaylistSource.MediaInfos.Insert(targetIndex + 1, sourceItem);
+        //     PlaylistSource.MediaInfos.RemoveAt(sourceIndex);
+        // }
+        // else if (sourceIndex > targetIndex)
+        // {
+        //     int removeIndex = sourceIndex + 1;
+        //     if (PlaylistSource.MediaInfos.Count + 1 < removeIndex) return;
+        //     
+        //     PlaylistSource.MediaInfos.Insert(targetIndex, sourceItem);
+        //     PlaylistSource.MediaInfos.RemoveAt(removeIndex);
+        // }
+        //
+        // PlaylistSource.MediaInfos = new ObservableCollection<MediaInfo>(PlaylistSource.MediaInfos);
     }
 }

@@ -1,20 +1,40 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Windows;
+using System.Windows.Forms;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using NedoPlayer.Models;
 using NedoPlayer.Resources;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 using Application = System.Windows.Application;
+using MessageBox = System.Windows.MessageBox;
 
 namespace NedoPlayer.Services;
 
-internal class FileService : IOService
+internal class FileService : IFileService
 {
-    public string OpenFileDialog(string path)
+    private struct InternalMediaInfo
+    {
+        public string Path;
+        public string Title;
+        public TimeSpan? Duration;
+    }
+
+    public string OpenFileDialog(string path) => OpenFileDialog(path, Resource.MediaFileFilter);
+    
+    public string OpenFileDialog(string path, string filter)
     {
         using var openFileDialog = new OpenFileDialog();
         openFileDialog.InitialDirectory = path;
-        openFileDialog.Filter = Resource.MediaFileFilter;
+        openFileDialog.Filter = filter;
         openFileDialog.Multiselect = false;
         openFileDialog.FilterIndex = 1;
-        openFileDialog.RestoreDirectory = false;
+        openFileDialog.RestoreDirectory = true;
 
         return openFileDialog.ShowDialog() == DialogResult.OK ? openFileDialog.FileName : string.Empty;
     }
@@ -26,5 +46,55 @@ internal class FileService : IOService
         openFolderDialog.IsFolderPicker = true;
 
         return openFolderDialog.ShowDialog(Application.Current.MainWindow) == CommonFileDialogResult.Ok ? openFolderDialog.FileName : string.Empty;
+    }
+
+    public void SavePlaylist(Playlist playlist, string startPath)
+    {
+        using var saveFileDialog = new SaveFileDialog();
+        saveFileDialog.InitialDirectory = startPath;
+        saveFileDialog.Filter = @"nypl files (*.nypl)|*.nypl|All files|*.*";
+        saveFileDialog.FilterIndex = 1;
+        saveFileDialog.RestoreDirectory = true;
+
+        if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
+
+        List<InternalMediaInfo> internalMediaInfos = playlist.MediaInfos.Select(mediaInfo => new InternalMediaInfo
+        {
+            Path = mediaInfo.Path, Title = mediaInfo.Title, Duration = mediaInfo.Duration
+        }).ToList();
+
+        var serialization = new SerializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
+        var res = serialization.Serialize(internalMediaInfos);
+        Debug.Write(res);
+        
+        File.WriteAllText(saveFileDialog.FileName, res);
+    }
+
+    public Playlist OpenPlaylist(string fileName)
+    {
+        if (!File.Exists(fileName)) return new Playlist();
+        
+        var deserializer = new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
+        var fileText = File.ReadAllText(fileName);
+        try
+        {
+            var internalMediaInfos = deserializer.Deserialize<List<InternalMediaInfo>>(fileText)
+                .Select(x => new MediaInfo(0, x.Path, x.Title, x.Duration))
+                .Where(mediaInfo => File.Exists(mediaInfo.Path + mediaInfo.Title))
+                .ToList();
+
+            var res = new Playlist
+            {
+                MediaInfos = new ObservableCollection<MediaInfo>(internalMediaInfos)
+            };
+        
+            return res;
+        }
+        catch (Exception)
+        {
+            MessageBox.Show($"Файл {Path.GetFileName(fileName)} поврежден или имеет недопустимый формат.", "Ошибка",
+                MessageBoxButton.OK, MessageBoxImage.Error);
+            return new Playlist();
+        }
     }
 }

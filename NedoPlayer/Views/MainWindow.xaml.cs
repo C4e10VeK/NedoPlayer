@@ -54,6 +54,11 @@ public partial class MainWindow
     private void OpenMediaFromArgs()
     {
         if (App.Args == null || !File.Exists(App.Args[0]) || DataContext is not MainViewModel dt) return;
+        if (App.Args[0].ToLower().EndsWith(".nypl"))
+        {
+            dt.OpenPlaylistFile(App.Args[0]);
+            return;
+        }
         dt.OpenMediaFileInternal(App.Args[0]);
         dt.NextMediaCommand.Execute(null);
         dt.MediaControlModel.IsPaused = false;
